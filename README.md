@@ -64,7 +64,7 @@ Built with **Vue 3 (Composition API)**, **Pinia**, **Vite**, and **Supabase** fo
 ### Local Installation
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/pharmacist-sabot/drug-cup-online.git
+    git clone https://github.com/suradet-ps/drug-cup-online.git
     cd drug-cup-online
     ```
 
