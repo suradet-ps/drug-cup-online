@@ -46,10 +46,8 @@
     </aside>
 </template>
 
-<script setup>
-defineProps({
-    isOpen: Boolean,
-});
+<script setup lang="ts">
+defineProps<{ isOpen: boolean }>();
 </script>
 
 <style scoped>

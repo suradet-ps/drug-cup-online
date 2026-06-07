@@ -43,7 +43,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import Sidebar from "@/components/Sidebar.vue";
 import { useAuthStore } from "@/store/auth";
@@ -57,7 +57,7 @@ function toggleSidebar() {
     isSidebarOpen.value = !isSidebarOpen.value;
 }
 
-async function handleLogout() {
+async function handleLogout(): Promise<void> {
     await auth.logout();
     router.push("/login");
 }

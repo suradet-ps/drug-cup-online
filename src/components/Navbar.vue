@@ -47,7 +47,7 @@
     </nav>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { useAuthStore } from "@/store/auth";
 import { useRouter } from "vue-router";
@@ -56,15 +56,15 @@ const auth = useAuthStore();
 const router = useRouter();
 const isMenuOpen = ref(false);
 
-function toggleMenu() {
+function toggleMenu(): void {
     isMenuOpen.value = !isMenuOpen.value;
 }
 
-function closeMenu() {
+function closeMenu(): void {
     isMenuOpen.value = false;
 }
 
-async function handleLogout() {
+async function handleLogout(): Promise<void> {
     await auth.logout();
     closeMenu();
     router.push("/login");
