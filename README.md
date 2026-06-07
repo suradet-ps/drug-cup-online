@@ -1,5 +1,14 @@
 # Drug Requisition System
 
+[![CI](https://github.com/suradet-ps/drug-cup-online/actions/workflows/ci.yml/badge.svg)](https://github.com/suradet-ps/drug-cup-online/actions/workflows/ci.yml)
+[![bun](https://img.shields.io/badge/bun-1.3.1-black?logo=bun&logoColor=white)](https://bun.sh)
+[![Vue 3](https://img.shields.io/badge/Vue-3.5-4FC08D?logo=vue.js&logoColor=white)](https://vuejs.org)
+[![Vite](https://img.shields.io/badge/Vite-8.0-646CFF?logo=vite&logoColor=white)](https://vitejs.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Biome](https://img.shields.io/badge/Biome-2.4-60A5FA?logo=biome&logoColor=white)](https://biomejs.dev)
+[![Supabase](https://img.shields.io/badge/Supabase-2.57-3FCF8E?logo=supabase&logoColor=white)](https://supabase.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A modern, web-based drug and medical supply requisition system designed for hospitals and their affiliated primary care units (PCUs). This application streamlines the ordering process, provides robust administrative oversight, and automates report generation.
 
 Built with **Vue 3 (Composition API)**, **Pinia**, **Vite**, and **Supabase** for a fast, scalable, and real-time backend experience.
@@ -52,7 +61,7 @@ Built with **Vue 3 (Composition API)**, **Pinia**, **Vite**, and **Supabase** fo
 ## 🚀 Getting Started
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v16 or higher recommended)
+- [Bun](https://bun.sh) v1.3+ (matches `packageManager` in `package.json`)
 - A code editor like [VS Code](https://code.visualstudio.com/)
 
 ### Supabase Setup
@@ -70,7 +79,7 @@ Built with **Vue 3 (Composition API)**, **Pinia**, **Vite**, and **Supabase** fo
 
 2.  Install the dependencies:
     ```bash
-    npm install
+    bun install
     ```
 
 3.  Create a `.env` file in the root of the project and add your Supabase credentials:
@@ -81,9 +90,25 @@ Built with **Vue 3 (Composition API)**, **Pinia**, **Vite**, and **Supabase** fo
 
 4.  Run the development server:
     ```bash
-    npm run dev
+    bun run dev
     ```
     The application should now be running on `http://localhost:5173` (or another port if 5173 is busy).
+
+## 🧹 Code Quality
+
+This project uses [Biome](https://biomejs.dev) for linting and formatting. Available scripts:
+
+| Script | Description |
+| --- | --- |
+| `bun run fmt` | Format all files in place |
+| `bun run fmt:check` | Check formatting without writing |
+| `bun run lint` | Run linter |
+| `bun run lint:fix` | Run linter with auto-fix |
+| `bun run check` | Run formatter + linter + assist checks |
+| `bun run check:fix` | Run `check` with auto-fix |
+| `bun run ci` | CI-friendly check (fails on any issue) |
+| `bun run typecheck` | Run `vue-tsc` type checking |
+| `bun run build` | Type-check and build for production |
 
 
 ## 📄 License
