@@ -368,7 +368,7 @@ h2 {
     margin-bottom: 0.25rem;
 }
 h2 i {
-    color: var(--primary-color);
+    color: var(--color-near-black);
     margin-right: 0.75rem;
 }
 .text-muted {

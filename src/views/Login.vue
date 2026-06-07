@@ -32,7 +32,7 @@
                 </p>
                 <button
                     type="submit"
-                    class="btn btn-primary"
+                    class="btn btn-primary btn-submit"
                     :disabled="loading"
                 >
                     <i class="fas fa-sign-in-alt"></i>
@@ -78,6 +78,7 @@ async function handleLogin(): Promise<void> {
 </script>
 
 <style scoped>
+/* White canvas auth page — DESIGN.md §contact-form-card on white canvas */
 .login-wrapper {
     display: flex;
     justify-content: center;
@@ -88,23 +89,23 @@ async function handleLogin(): Promise<void> {
     top: 0;
     left: 0;
     height: 100vh;
-    background: linear-gradient(135deg, #f5f1ff 0%, #e6f7ff 100%);
+    background-color: var(--color-canvas);
 }
 
+/* Contact-form-card: rounded white panel, thin border, flat (no shadow) */
 .login-container {
     width: 100%;
-    max-width: 420px;
-    text-align: center;
-    padding: 2.5rem;
-    border: none;
-    box-shadow: var(--box-shadow-lg);
-    animation: fade-in 0.5s ease-out;
+    max-width: 400px;
+    padding: var(--space-10) var(--space-10);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    animation: fade-in var(--duration-slow) var(--easing-standard);
 }
 
 @keyframes fade-in {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(-8px);
     }
     to {
         opacity: 1;
@@ -112,51 +113,84 @@ async function handleLogin(): Promise<void> {
     }
 }
 
-.login-header .fa-hospital-user {
-    font-size: 3rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
+.login-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
 }
 
+/* Icon as a small system marker */
+.login-header .fa-hospital-user {
+    font-size: 2rem;
+    color: var(--color-near-black);
+    margin-bottom: var(--space-4);
+    display: block;
+}
+
+/* Section heading scale — Unica77/Inter (body face) per DESIGN.md */
 .login-header h1 {
-    font-size: 1.75rem;
-    margin-bottom: 0.5rem;
+    font-family: var(--font-body);
+    font-size: var(--text-card-heading);
+    font-weight: var(--weight-normal);
+    letter-spacing: var(--tracking-card-heading);
+    color: var(--color-ink);
     border: none;
+    padding: 0;
+    margin-bottom: var(--space-2);
 }
 
 .login-header p {
-    color: var(--text-muted);
-    margin-bottom: 2rem;
+    font-size: var(--text-caption);
+    color: var(--color-muted-slate);
+    margin-bottom: 0;
 }
 
-button {
+/* Form group label */
+.form-group label {
+    color: var(--color-ink);
+}
+
+/* Primary pill button */
+.btn-submit {
     width: 100%;
-    margin-top: 1rem;
-    padding: 0.75rem;
-    font-size: 1.1rem;
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-button);
     justify-content: center;
 }
 
-button span {
+.btn-submit span {
     display: inline;
 }
 
+/* Error state */
 .error-message {
-    color: var(--danger-color);
-    margin-top: 1rem;
-    font-size: 0.9rem;
+    color: var(--color-error);
+    font-size: var(--text-caption);
+    margin-top: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background-color: #fff5f5;
+    border: 1px solid rgba(179, 0, 0, 0.2);
+    border-radius: var(--radius-xs);
 }
 
+/* Register link */
 .register-link {
-    margin-top: 1.5rem;
-    font-size: 0.9rem;
-    color: var(--text-muted);
+    margin-top: var(--space-6);
+    font-size: var(--text-caption);
+    color: var(--color-muted-slate);
+    text-align: center;
+}
+
+.register-link a {
+    color: var(--color-action-blue);
+    font-weight: var(--weight-normal);
 }
 
 @media (max-width: 480px) {
     .login-container {
-        padding: 2rem 1.5rem;
-        margin: 0 1rem;
+        padding: var(--space-8) var(--space-6);
+        margin: 0 var(--space-4);
+        max-width: calc(100% - var(--space-8));
     }
 }
 </style>

@@ -1,0 +1,45 @@
+/* Design Token: Typography
+   Source of truth: DESIGN.md §Typography
+   ------------------------------------------------------------------ */
+:root {
+  /* Font Families */
+  --font-display: 'CohereText', 'Space Grotesk', 'Inter', 'Noto Sans Thai', ui-sans-serif, system-ui;
+  --font-body:    'Unica77 Cohere Web', 'Inter', 'Noto Sans Thai', 'Arial', ui-sans-serif, system-ui;
+  --font-mono:    'CohereMono', 'Courier New', 'Arial', ui-sans-serif, system-ui;
+
+  /* Font Sizes */
+  --text-hero:             96px;
+  --text-product-display:  72px;
+  --text-section-display:  60px;
+  --text-section-heading:  48px;
+  --text-card-heading:     32px;
+  --text-feature-heading:  24px;
+  --text-body-lg:          18px;
+  --text-body:             16px;
+  --text-button:           14px;
+  --text-caption:          14px;
+  --text-mono-label:       14px;
+  --text-micro:            12px;
+
+  /* Line Heights */
+  --leading-tight:    1.00;
+  --leading-snug:     1.20;
+  --leading-normal:   1.30;
+  --leading-body:     1.40;
+  --leading-relaxed:  1.50;
+  --leading-button:   1.71;
+
+  /* Letter Spacing */
+  --tracking-hero:            -1.92px;
+  --tracking-product:         -1.44px;
+  --tracking-section-display: -1.2px;
+  --tracking-section-heading: -0.48px;
+  --tracking-card-heading:    -0.32px;
+  --tracking-none:             0;
+  --tracking-mono:             0.28px;
+
+  /* Font Weights */
+  --weight-normal:   400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+}

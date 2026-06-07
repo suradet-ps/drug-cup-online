@@ -155,79 +155,83 @@ function formatDate(dateString: string | null): string {
 </script>
 
 <style scoped>
-.container h2 {
-    margin-bottom: 2rem;
-}
+/* Section heading adjustments */
 h3 {
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--border-color);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-hairline);
+    font-size: var(--text-feature-heading);
+    color: var(--color-ink);
+    font-weight: var(--weight-normal);
 }
+
 .section-divider {
-    margin-top: 3rem;
+    margin-top: var(--space-14);
 }
+
 .table-container {
     overflow-x: auto;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-th,
-td {
-    border: 1px solid var(--border-color);
-    padding: 0.8rem;
-    text-align: left;
-    vertical-align: middle;
-}
-thead {
-    background-color: var(--light-color);
-}
-.status-badge {
-    padding: 0.3em 0.7em;
-    border-radius: 12px;
-    color: white;
-    font-size: 0.85rem;
-    font-weight: bold;
-    text-transform: capitalize;
-}
-.status-badge.submitted {
-    background-color: var(--warning-color);
-    color: var(--dark-color);
-}
-.status-badge.approved {
-    background-color: var(--primary-color);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
 }
 
+/* Status badge overrides (supplement global) */
+.status-badge.submitted {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+.status-badge.approved {
+    background-color: var(--color-pale-blue);
+    color: var(--color-action-blue);
+    border: 1px solid rgba(24, 99, 220, 0.2);
+}
+
+/* Action links as small pill buttons */
 .btn-sm {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    color: white;
+    padding: var(--space-1-5) var(--space-4);
+    font-size: var(--text-micro);
+    border-radius: var(--radius-pill);
     text-decoration: none;
-    border-radius: var(--border-radius);
-    display: inline-block;
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    font-weight: var(--weight-medium);
+    white-space: nowrap;
+    transition:
+        background-color var(--duration-base) var(--easing-standard),
+        color            var(--duration-base) var(--easing-standard);
+}
+
+.btn-primary {
+    background-color: var(--color-near-black);
+    color: var(--color-canvas);
     border: none;
 }
-.btn-primary {
-    background-color: var(--primary-color);
-}
 .btn-primary:hover {
-    background-color: var(--primary-hover);
-}
-.btn-success {
-    background-color: var(--success-color);
-}
-.btn-success:hover {
-    background-color: #218838;
+    background-color: var(--color-primary-hover);
+    text-decoration: none;
+    color: var(--color-canvas);
 }
 
+.btn-success {
+    background-color: var(--color-status-fulfilled);
+    color: var(--color-canvas);
+    border: none;
+}
+.btn-success:hover {
+    background-color: var(--color-success-hover);
+    text-decoration: none;
+    color: var(--color-canvas);
+}
+
+/* No data placeholder */
 .no-data-message {
-    padding: 1.5rem;
+    padding: var(--space-8) var(--space-6);
     text-align: center;
-    color: var(--secondary-color);
-    background-color: var(--light-color);
-    border: 1px dashed var(--border-color);
-    border-radius: var(--border-radius);
+    color: var(--color-muted-slate);
+    font-size: var(--text-caption);
+    border: 1px dashed var(--color-hairline);
+    border-radius: var(--radius-sm);
 }
 </style>

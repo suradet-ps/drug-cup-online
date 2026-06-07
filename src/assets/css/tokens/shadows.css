@@ -1,0 +1,13 @@
+/* Design Token: Elevation & Shadows
+   Source of truth: DESIGN.md §Elevation & Depth
+   Cohere is mostly flat — depth via surface alternation and thin borders.
+   ------------------------------------------------------------------ */
+:root {
+  --shadow-none:       none;
+  --shadow-border:     0 0 0 1px var(--color-hairline);
+  --shadow-card:       0 1px 2px rgba(0, 0, 0, 0.04),
+                       0 0 0 1px var(--color-card-border);
+  --shadow-focus:      0 0 0 3px rgba(76, 110, 230, 0.35);
+  --shadow-form-focus: 0 0 0 3px rgba(155, 96, 170, 0.25);
+  --shadow-overlay:    0 8px 24px rgba(0, 0, 0, 0.12);
+}

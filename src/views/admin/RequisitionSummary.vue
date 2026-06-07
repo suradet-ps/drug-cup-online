@@ -268,13 +268,13 @@ function printSummary(): void {
 <style scoped>
 h2 i {
     margin-right: 0.75rem;
-    color: var(--primary-color);
+    color: var(--color-near-black);
 }
 .report-options {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
 }
 .form-group {
     flex: 1 1 300px;
@@ -286,15 +286,15 @@ h2 i {
     font-weight: 600;
 }
 .print-actions {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-color);
+    margin-top: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-hairline);
     text-align: right;
 }
 .no-data-message i {
     font-size: 2.5rem;
     color: var(--info-color);
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 .no-data-message p {
     font-size: 1.1rem;

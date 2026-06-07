@@ -162,32 +162,32 @@ async function savePcuPersonnel(pcu: PcuSetting): Promise<void> {
 h2 i,
 h3 i {
     margin-right: 0.75rem;
-    color: var(--primary-color);
+    color: var(--color-near-black);
 }
 
 .settings-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
+    gap: var(--space-6);
+    margin-top: var(--space-6);
 }
 
 .card h4 {
     font-size: 1.25rem;
     margin-top: 0;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 1.5rem;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-hairline);
+    margin-bottom: var(--space-6);
 }
 
 .action-footer {
-    margin-top: 1.5rem;
+    margin-top: var(--space-6);
     text-align: right;
 }
 
 hr {
     border: none;
-    border-top: 1px solid var(--border-color);
-    margin: 1.5rem 0;
+    border-top: 1px solid var(--color-hairline);
+    margin: var(--space-6) 0;
 }
 </style>

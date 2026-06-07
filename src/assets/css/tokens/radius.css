@@ -1,0 +1,12 @@
+/* Design Token: Border Radius
+   Source of truth: DESIGN.md §Shapes §Radius Scale
+   ------------------------------------------------------------------ */
+:root {
+  --radius-xs:   4px;    /* search fields, thumbnails, utility elements */
+  --radius-sm:   8px;    /* chips, cards, small media, dialogs */
+  --radius-md:   16px;   /* medium product cards, grouped blocks */
+  --radius-lg:   22px;   /* signature media-card and soft placeholder radius */
+  --radius-xl:   30px;   /* research/topic filter pills */
+  --radius-pill: 32px;   /* primary CTA buttons */
+  --radius-full: 9999px; /* round status elements, fully pill-shaped controls */
+}

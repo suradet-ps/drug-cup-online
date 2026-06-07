@@ -155,7 +155,7 @@ function formatCurrency(value: number): string {
 h2 i,
 h4 i {
     margin-right: 0.75rem;
-    color: var(--primary-color);
+    color: var(--color-near-black);
 }
 .report-options {
     display: flex;

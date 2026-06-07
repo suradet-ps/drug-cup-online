@@ -39,61 +39,66 @@ function goTo(path: string): void {
 </script>
 
 <style scoped>
+/* White canvas home — DESIGN.md §whitespace philosophy, section-heading scale */
 .home-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 150px);
+    min-height: calc(100vh - 56px);
+    background-color: var(--color-canvas);
+    padding: var(--space-10) var(--space-4);
 }
 
+/* Card with thin border — DESIGN.md §Bordered elevation */
 .home-card {
-    max-width: 500px;
+    max-width: 480px;
     width: 100%;
     text-align: center;
-    padding: 2.5rem;
-    border: none;
-    box-shadow: var(--box-shadow-lg);
+    padding: var(--space-10);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
 }
 
+/* Section heading scale — Unica77/Inter (body face) per DESIGN.md */
 .home-card h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.2;
-    color: var(--primary-color);
+    font-family: var(--font-body);
+    font-size: var(--text-section-heading);
+    font-weight: var(--weight-normal);
+    letter-spacing: var(--tracking-section-heading);
+    line-height: var(--leading-snug);
+    color: var(--color-ink);
     border-bottom: none;
     padding-bottom: 0;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
+/* Caption / muted welcome text */
 .welcome-text {
-    font-size: 1.2rem;
-    color: var(--text-muted);
-    margin-bottom: 2rem;
+    font-size: var(--text-body-lg);
+    color: var(--color-muted-slate);
+    margin-bottom: var(--space-8);
 }
 
+/* Action area with thin top rule */
 .action-box {
-    border-top: 1px solid var(--border-color);
-    padding-top: 1.5rem;
-    margin-top: 1.5rem;
+    border-top: 1px solid var(--color-hairline);
+    padding-top: var(--space-6);
+    margin-top: var(--space-6);
 }
 
 .action-box p {
-    color: var(--text-muted);
-    margin-bottom: 1rem;
+    font-size: var(--text-caption);
+    color: var(--color-muted-slate);
+    margin-bottom: var(--space-4);
 }
 
-.action-box .btn {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1.1rem;
-}
-
+/* Pill button full-width */
+.action-box .btn,
 button {
     width: 100%;
-    margin-top: 1rem;
-    padding: 0.75rem;
-    font-size: 1.1rem;
+    padding: var(--space-3) var(--space-6);
     justify-content: center;
+    margin-top: 0;
 }
 
 button span {

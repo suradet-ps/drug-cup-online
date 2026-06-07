@@ -300,7 +300,7 @@ function formatCurrency(value: number | null | undefined): string {
 h2 i,
 h3 i {
     margin-right: 0.75rem;
-    color: var(--primary-color);
+    color: var(--color-near-black);
 }
 
 .report-options {

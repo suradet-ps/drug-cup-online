@@ -189,7 +189,7 @@ function formatCurrency(value: number | null | undefined): string {
 }
 
 .back-link {
-    color: var(--primary-color);
+    color: var(--color-near-black);
     text-decoration: none;
     font-weight: bold;
     font-size: 1rem;
@@ -201,7 +201,7 @@ function formatCurrency(value: number | null | undefined): string {
 
 .requisition-details h2 {
     margin-bottom: 1.5rem;
-    border-bottom: 2px solid var(--primary-color);
+    border-bottom: 2px solid var(--color-near-black);
     padding-bottom: 0.5rem;
 }
 
@@ -213,7 +213,7 @@ function formatCurrency(value: number | null | undefined): string {
     padding: 1.5rem;
     border-radius: var(--border-radius);
     margin-bottom: 2rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-hairline);
 }
 
 .summary-grid strong {
@@ -241,7 +241,7 @@ table {
 th,
 td {
     padding: 0.8rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-hairline);
     text-align: left;
     vertical-align: middle;
 }

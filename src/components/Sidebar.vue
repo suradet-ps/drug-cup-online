@@ -51,93 +51,109 @@ defineProps<{ isOpen: boolean }>();
 </script>
 
 <style scoped>
+/* Dark product panel — DESIGN.md §dark-feature-band / enterprise sidebar */
 .sidebar {
     width: 260px;
-    background-color: var(--surface-color);
-    border-right: 1px solid var(--border-color);
+    background-color: var(--color-near-black);
+    border-right: none;
     display: flex;
     flex-direction: column;
     height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
-    transition: transform 0.3s ease;
+    transition: transform var(--duration-slow) var(--easing-standard);
     z-index: 1100;
 }
 
 .sidebar-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--border-color);
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-header .logo {
-    font-size: 2rem;
-    color: var(--primary-color);
+    font-size: 1.5rem;
+    color: var(--color-canvas);
+    opacity: 0.9;
 }
 
 .header-text {
     display: flex;
     flex-direction: column;
     line-height: 1.3;
+    overflow: hidden;
 }
 
 .header-text .title {
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: var(--text-color);
+    font-family: var(--font-display);
+    font-size: var(--text-body);
+    font-weight: var(--weight-normal);
+    color: var(--color-canvas);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .header-text .subtitle {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-muted);
+    font-size: var(--text-micro);
+    font-weight: var(--weight-normal);
+    color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar-nav {
-    padding: 1rem;
+    padding: var(--space-4) var(--space-3);
     flex-grow: 1;
+    overflow-y: auto;
 }
 
 .sidebar-nav a {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
-    padding: 0.85rem 1rem;
-    border-radius: var(--border-radius);
-    color: var(--text-muted);
-    font-weight: 500;
+    gap: var(--space-3);
+    padding: var(--space-2-5) var(--space-4);
+    border-radius: var(--radius-sm);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-normal);
     text-decoration: none;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-px);
     transition:
-        background-color 0.2s,
-        color 0.2s;
+        background-color var(--duration-base) var(--easing-standard),
+        color            var(--duration-base) var(--easing-standard);
 }
 
 .sidebar-nav a i {
-    width: 20px;
+    width: 18px;
     text-align: center;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
+    flex-shrink: 0;
 }
 
 .sidebar-nav a:hover {
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    background-color: rgba(255, 255, 255, 0.07);
+    color: var(--color-canvas);
     text-decoration: none;
 }
 
 .sidebar-nav a.router-link-exact-active {
-    background-color: var(--primary-color);
-    color: white;
-    box-shadow: var(--box-shadow);
+    background-color: rgba(255, 255, 255, 0.12);
+    color: var(--color-canvas);
+}
+
+.sidebar-nav a.router-link-exact-active i {
+    color: var(--color-canvas);
 }
 
 @media (max-width: 992px) {
     .sidebar {
         transform: translateX(-100%);
-        box-shadow: var(--box-shadow-lg);
+        box-shadow: var(--shadow-overlay);
     }
     .sidebar.is-open {
         transform: translateX(0);

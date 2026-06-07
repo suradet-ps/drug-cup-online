@@ -158,15 +158,15 @@ function formatDate(dateString: string | null): string {
 <style scoped>
 h2 i {
     margin-right: 0.75rem;
-    color: var(--primary-color);
+    color: var(--color-near-black);
 }
 .action-buttons {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-2);
     justify-content: center;
 }
 .btn-sm {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
+    padding: var(--space-1-5) var(--space-4);
+    font-size: var(--text-micro);
 }
 </style>

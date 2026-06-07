@@ -74,82 +74,109 @@ async function handleLogout(): Promise<void> {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    transition: margin-left 0.3s ease;
+    background-color: var(--color-canvas);
+    transition: margin-left var(--duration-slow) var(--easing-standard);
 }
 
+/* Top header — white canvas, thin border, right-aligned user zone */
 .top-header {
-    background-color: var(--surface-color);
-    border-bottom: 1px solid var(--border-color);
-    padding: 0.75rem 1.5rem;
+    background-color: var(--color-canvas);
+    border-bottom: 1px solid var(--color-hairline);
+    padding: 0 var(--space-6);
+    height: 56px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    gap: var(--space-4);
 }
 
 main {
     flex-grow: 1;
-    background-color: transparent;
+    background-color: var(--color-canvas);
 }
 
+/* User info (right zone) */
 .user-info {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    color: var(--text-color);
+    gap: var(--space-3);
+    color: var(--color-ink);
 }
+
 .user-info .fa-user-circle {
-    font-size: 2rem;
-    color: var(--secondary-color);
+    font-size: 1.5rem;
+    color: var(--color-muted-slate);
 }
+
 .user-details {
     display: flex;
     flex-direction: column;
     line-height: 1.2;
 }
+
 .user-details .username {
-    font-weight: 600;
-}
-.user-details .role {
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-medium);
+    color: var(--color-ink);
 }
 
+.user-details .role {
+    font-size: var(--text-micro);
+    color: var(--color-muted-slate);
+}
+
+/* Logout button */
 .btn-logout {
     background: none;
-    border: none;
+    border: 1px solid var(--color-hairline);
     cursor: pointer;
-    font-size: 1.5rem;
-    padding: 0.5rem;
-    border-radius: 50%;
+    font-size: 0.9rem;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
     line-height: 1;
     transition:
-        color 0.2s,
-        background-color 0.2s;
-    color: var(--text-muted);
-}
-.btn-logout:hover {
-    color: var(--danger-color);
-    background-color: rgba(211, 47, 47, 0.1);
+        color            var(--duration-base) var(--easing-standard),
+        background-color var(--duration-base) var(--easing-standard),
+        border-color     var(--duration-base) var(--easing-standard);
+    color: var(--color-muted-slate);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
 }
 
+.btn-logout:hover {
+    color: var(--color-error);
+    background-color: #fff5f5;
+    border-color: rgba(179, 0, 0, 0.2);
+}
+
+/* Hamburger for mobile */
 .hamburger-menu {
     display: none;
     margin-right: auto;
-    font-size: 1.5rem;
+    font-size: 0.9rem;
     background: none;
-    border: none;
-    color: var(--primary-color);
+    border: 1px solid var(--color-hairline);
+    color: var(--color-ink);
     cursor: pointer;
-    padding: 0.5rem;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    width: 34px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
 }
 
+/* Dark overlay when sidebar is open on mobile */
 .sidebar-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.4);
     z-index: 1050;
     display: none;
 }
@@ -158,7 +185,9 @@ main {
     .main-content {
         margin-left: 0;
     }
-    .hamburger-menu,
+    .hamburger-menu {
+        display: flex;
+    }
     .sidebar-overlay {
         display: block;
     }

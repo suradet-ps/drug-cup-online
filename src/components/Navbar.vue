@@ -72,10 +72,12 @@ async function handleLogout(): Promise<void> {
 </script>
 
 <style scoped>
+/* White canvas navbar — DESIGN.md §Global nav (logo left, menu center, user right) */
 .navbar {
-    background-color: var(--surface-color);
-    box-shadow: var(--box-shadow);
-    padding: 0.75rem 1.5rem;
+    background-color: var(--color-canvas);
+    border-bottom: 1px solid var(--color-hairline);
+    padding: 0 var(--space-6);
+    height: 56px;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -84,70 +86,90 @@ async function handleLogout(): Promise<void> {
 .navbar-container {
     max-width: 1200px;
     margin: 0 auto;
+    height: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: relative;
 }
 
+/* Brand — logo left zone */
 .navbar-brand {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--primary-color);
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--text-body);
+    font-weight: var(--weight-normal);
+    color: var(--color-ink);
     text-decoration: none;
     z-index: 10;
 }
 
-.navbar-brand:hover {
-    text-decoration: none;
-    opacity: 0.8;
+.navbar-brand i {
+    color: var(--color-near-black);
+    font-size: 1.1rem;
 }
 
+.navbar-brand:hover {
+    text-decoration: none;
+    color: var(--color-near-black);
+}
+
+.brand-text {
+    color: var(--color-ink);
+}
+
+.brand-subtext {
+    color: var(--color-muted-slate);
+    font-size: var(--text-caption);
+}
+
+/* Nav links — right zone */
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: var(--space-2);
     transition:
-        transform 0.3s ease-out,
-        opacity 0.3s ease-out;
+        transform var(--duration-slow) var(--easing-standard),
+        opacity   var(--duration-slow) var(--easing-standard);
 }
 
 .nav-links a {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--text-muted);
+    gap: var(--space-2);
+    color: var(--color-muted-slate);
     text-decoration: none;
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--border-radius);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-normal);
     transition:
-        background-color 0.2s,
-        color 0.2s;
-    font-weight: 500;
+        background-color var(--duration-base) var(--easing-standard),
+        color            var(--duration-base) var(--easing-standard);
 }
 
 .nav-links a:hover,
 .nav-links a.router-link-exact-active {
-    background-color: var(--bg-color);
-    color: var(--primary-color);
+    background-color: var(--color-soft-stone);
+    color: var(--color-ink);
     text-decoration: none;
 }
 
+/* User info — right zone */
 .user-info {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding-left: 1.5rem;
-    border-left: 1px solid var(--border-color);
-    color: var(--text-color);
+    gap: var(--space-3);
+    padding-left: var(--space-4);
+    border-left: 1px solid var(--color-hairline);
+    color: var(--color-ink);
 }
 
 .user-info .fa-user-circle {
-    font-size: 2rem;
-    color: var(--secondary-color);
+    font-size: 1.5rem;
+    color: var(--color-muted-slate);
 }
 
 .user-details {
@@ -157,68 +179,86 @@ async function handleLogout(): Promise<void> {
 }
 
 .user-details .username {
-    font-weight: 600;
-}
-.user-details .role {
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-medium);
+    color: var(--color-ink);
 }
 
+.user-details .role {
+    font-size: var(--text-micro);
+    color: var(--color-muted-slate);
+}
+
+/* Logout button */
 .btn-logout {
     background: none;
-    border: none;
+    border: 1px solid var(--color-hairline);
     cursor: pointer;
-    font-size: 1.5rem;
-    padding: 0.5rem;
-    border-radius: 50%;
+    font-size: 0.9rem;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
     line-height: 1;
     transition:
-        color 0.2s,
-        background-color 0.2s;
-    color: var(--text-muted);
-}
-.btn-logout:hover {
-    color: var(--danger-color);
-    background-color: rgba(211, 47, 47, 0.1);
+        color            var(--duration-base) var(--easing-standard),
+        background-color var(--duration-base) var(--easing-standard),
+        border-color     var(--duration-base) var(--easing-standard);
+    color: var(--color-muted-slate);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
 }
 
-/* Hamburger Menu */
+.btn-logout:hover {
+    color: var(--color-error);
+    background-color: #fff5f5;
+    border-color: rgba(179, 0, 0, 0.2);
+}
+
+/* Hamburger */
 .hamburger-menu {
     display: none;
     background: none;
-    border: none;
+    border: 1px solid var(--color-hairline);
     cursor: pointer;
-    font-size: 1.5rem;
-    color: var(--primary-color);
-    padding: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-ink);
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
     z-index: 10;
+    width: 34px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Responsive Styles */
+/* Mobile */
 @media (max-width: 820px) {
     .brand-subtext {
         display: none;
     }
 
     .hamburger-menu {
-        display: block;
+        display: flex;
     }
 
     .nav-links {
         position: absolute;
-        top: calc(100% + 10px);
+        top: calc(100% + var(--space-2));
         left: 0;
         right: 0;
-        background-color: var(--surface-color);
-        box-shadow: var(--box-shadow-lg);
-        border-radius: var(--border-radius);
-        padding: 1rem;
+        background-color: var(--color-canvas);
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-sm);
+        padding: var(--space-3);
         flex-direction: column;
         align-items: stretch;
-        gap: 0.5rem;
+        gap: var(--space-px);
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(-8px);
         pointer-events: none;
+        box-shadow: var(--shadow-overlay);
     }
 
     .nav-links.is-open {
@@ -229,18 +269,18 @@ async function handleLogout(): Promise<void> {
 
     .nav-links a {
         justify-content: center;
-        padding: 0.8rem;
+        padding: var(--space-3);
     }
 
     .user-info {
         flex-direction: column;
         border-left: none;
         padding-left: 0;
-        padding-top: 1rem;
-        margin-top: 0.5rem;
-        border-top: 1px solid var(--border-color);
+        padding-top: var(--space-4);
+        margin-top: var(--space-2);
+        border-top: 1px solid var(--color-hairline);
         width: 100%;
-        gap: 1rem;
+        gap: var(--space-3);
     }
 
     .user-details {

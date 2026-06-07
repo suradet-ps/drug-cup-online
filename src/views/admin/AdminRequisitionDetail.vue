@@ -305,16 +305,16 @@ function formatCurrency(value: number | null): string {
 
 <style scoped>
 .header-actions {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-6);
 }
 .requisition-summary {
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-8);
 }
 .summary-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 .summary-header h2 {
     margin-bottom: 0;
@@ -324,9 +324,9 @@ function formatCurrency(value: number | null): string {
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.5rem;
-    border-top: 1px solid var(--border-color);
-    padding-top: 1.5rem;
+    gap: var(--space-6);
+    border-top: 1px solid var(--color-hairline);
+    padding-top: var(--space-6);
 }
 .summary-grid p {
     margin: 0;
@@ -339,7 +339,7 @@ function formatCurrency(value: number | null): string {
 h2 i,
 h3 i {
     margin-right: 0.75rem;
-    color: var(--primary-color);
+    color: var(--color-near-black);
 }
 .table-wrapper {
     padding: 0;
@@ -348,20 +348,22 @@ h3 i {
 .quantity-input {
     width: 90px;
     text-align: center;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--color-hairline);
 }
 .admin-actions {
-    margin-top: 2rem;
+    margin-top: var(--space-8);
 }
 .action-buttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
 }
 .hint {
-    font-size: 0.9rem;
+    font-size: var(--text-caption);
     color: var(--text-muted);
-    margin-top: 1rem;
+    margin-top: var(--space-4);
     margin-bottom: 0;
 }
 </style>

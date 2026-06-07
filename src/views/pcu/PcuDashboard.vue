@@ -203,25 +203,25 @@ function goToRequisition(periodId: number, requisitionId: number | null): void {
 h2 i,
 h3 i {
     margin-right: 0.75rem;
-    color: var(--primary-color);
+    color: var(--color-near-black);
 }
 .period-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
+    gap: var(--space-6);
 }
 .period-card {
     display: flex;
     flex-direction: column;
 }
 .period-card h4 {
-    margin-bottom: 0.5rem;
-    font-size: 1.2rem;
+    margin-bottom: var(--space-2);
+    font-size: var(--text-body-lg);
 }
 .period-dates {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
+    color: var(--color-muted-slate);
+    font-size: var(--text-caption);
+    margin-bottom: var(--space-6);
     flex-grow: 1;
 }
 .period-dates i {
@@ -231,17 +231,11 @@ h3 i {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: #eaf6ec;
-    color: #208139;
-    padding: 0.75rem;
-    border-radius: var(--border-radius);
+    background-color: var(--color-pale-green);
+    color: var(--color-status-fulfilled);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-sm);
     font-weight: 500;
-}
-.btn-info {
-    background-color: var(--info-color);
-}
-.btn-info:hover {
-    background-color: var(--info-hover);
 }
 .table-wrapper.card {
     padding: 0;

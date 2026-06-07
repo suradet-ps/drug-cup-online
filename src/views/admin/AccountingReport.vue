@@ -169,7 +169,7 @@ function formatCurrency(value: number | null): string {
 <style scoped>
 h2 i {
     margin-right: 0.75rem;
-    color: var(--primary-color);
+    color: var(--color-near-black);
 }
 .report-options {
     display: flex;

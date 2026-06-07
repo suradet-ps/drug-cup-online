@@ -23,60 +23,73 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f1ff 0%, #e6f7ff 100%);
-    padding: 1rem;
+    background-color: var(--color-canvas);
+    padding: var(--space-4);
 }
+
 .content-card {
     max-width: 500px;
     width: 100%;
     text-align: center;
-    padding: 2.5rem;
-    border: none;
-    box-shadow: var(--box-shadow-lg);
-    animation: fade-in 0.5s ease-out;
+    padding: var(--space-10);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    animation: fade-in var(--duration-slow) var(--easing-standard);
 }
+
 @keyframes fade-in {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(-8px);
     }
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
+
 .header {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-6);
 }
+
 .icon-success {
-    font-size: 4rem;
-    color: #28a745;
-    margin-bottom: 1rem;
+    font-size: 3rem;
+    color: var(--color-status-fulfilled);
+    margin-bottom: var(--space-4);
+    display: block;
 }
+
 h1 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: var(--text-color);
+    font-family: var(--font-body);
+    font-size: var(--text-card-heading);
+    font-weight: var(--weight-normal);
+    letter-spacing: var(--tracking-card-heading);
+    color: var(--color-ink);
     border: none;
     padding: 0;
     margin: 0;
 }
+
 .message {
-    font-size: 1.1rem;
-    color: var(--text-muted);
-    line-height: 1.6;
-    margin-bottom: 1rem;
+    font-size: var(--text-body);
+    color: var(--color-muted-slate);
+    line-height: var(--leading-body);
+    margin-bottom: var(--space-3);
 }
+
 .sub-message {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 2rem;
+    font-size: var(--text-caption);
+    color: var(--color-muted-slate);
+    margin-bottom: var(--space-8);
 }
+
 .actions {
-    margin-top: 1.5rem;
+    margin-top: var(--space-6);
 }
+
 .actions .btn {
     width: 100%;
-    padding: 0.75rem;
+    padding: var(--space-3) var(--space-6);
+    justify-content: center;
 }
 </style>
