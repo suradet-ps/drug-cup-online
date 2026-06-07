@@ -191,10 +191,10 @@ async function handleRegister(): Promise<void> {
       } else if (error.message.includes('PCU does not exist')) {
         errorMessage.value = 'ข้อมูล รพ.สต. ไม่ถูกต้อง กรุณาเลือกใหม่อีกครั้ง';
       } else {
-        errorMessage.value = 'เกิดข้อผิดพลาด: ' + error.message;
+        errorMessage.value = `เกิดข้อผิดพลาด: ${error.message}`;
       }
     } else {
-      errorMessage.value = 'เกิดข้อผิดพลาด: ' + String(error);
+      errorMessage.value = `เกิดข้อผิดพลาด: ${String(error)}`;
     }
   } finally {
     loading.value = false;

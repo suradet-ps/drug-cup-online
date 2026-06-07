@@ -258,8 +258,7 @@ async function fetchItems(): Promise<void> {
     items.value = (data ?? []) as unknown as Item[];
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    error.value =
-      'ไม่สามารถโหลดข้อมูลรายการยาได้: ' + (err instanceof Error ? err.message : String(err));
+    error.value = `ไม่สามารถโหลดข้อมูลรายการยาได้: ${err instanceof Error ? err.message : String(err)}`;
     console.error(err);
   } finally {
     loading.value = false;
@@ -286,7 +285,7 @@ async function updateItem(item: Item): Promise<void> {
     alert(`อัปเดตรายการ "${item.name}" เรียบร้อยแล้ว`);
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    alert('เกิดข้อผิดพลาดในการอัปเดต: ' + (err instanceof Error ? err.message : String(err)));
+    alert(`เกิดข้อผิดพลาดในการอัปเดต: ${err instanceof Error ? err.message : String(err)}`);
     console.error(err);
   }
 }
@@ -355,7 +354,7 @@ async function handleAddItem(): Promise<void> {
     await fetchItems();
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    alert('เกิดข้อผิดพลาดในการเพิ่มรายการ: ' + (err instanceof Error ? err.message : String(err)));
+    alert(`เกิดข้อผิดพลาดในการเพิ่มรายการ: ${err instanceof Error ? err.message : String(err)}`);
     console.error(err);
   } finally {
     isSubmitting.value = false;

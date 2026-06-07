@@ -133,7 +133,7 @@ async function generateReport(): Promise<void> {
     reportData.value = (data ?? []) as unknown as AccountingSummaryRow[];
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    error.value = 'เกิดข้อผิดพลาดในการประมวลผล: ' + (err instanceof Error ? err.message : String(err));
+    error.value = `เกิดข้อผิดพลาดในการประมวลผล: ${err instanceof Error ? err.message : String(err)}`;
     console.error(err);
   } finally {
     loading.value = false;
@@ -150,7 +150,7 @@ function printReport(): void {
 }
 
 function formatCurrency(value: number | null): string {
-  if (value === null || isNaN(value)) return '0.00';
+  if (value === null || Number.isNaN(value)) return '0.00';
   return Number(value).toLocaleString('th-TH', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,

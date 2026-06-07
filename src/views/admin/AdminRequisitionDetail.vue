@@ -195,7 +195,7 @@ async function fetchRequisition(): Promise<void> {
     );
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    error.value = 'ไม่สามารถโหลดข้อมูลได้: ' + (err instanceof Error ? err.message : String(err));
+    error.value = `ไม่สามารถโหลดข้อมูลได้: ${err instanceof Error ? err.message : String(err)}`;
     console.error(err);
   } finally {
     loading.value = false;
@@ -238,7 +238,7 @@ async function saveAndApprove(): Promise<void> {
     await fetchRequisition();
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    alert('เกิดข้อผิดพลาด: ' + (err instanceof Error ? err.message : String(err)));
+    alert(`เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`);
     console.error(err);
   } finally {
     isUpdating.value = false;
@@ -260,7 +260,7 @@ async function fulfillRequisition(): Promise<void> {
     await fetchRequisition();
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    alert('เกิดข้อผิดพลาด: ' + (err instanceof Error ? err.message : String(err)));
+    alert(`เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`);
     console.error(err);
   } finally {
     isUpdating.value = false;
@@ -278,7 +278,7 @@ function formatDate(dateString: string | null): string {
   });
 }
 function formatCurrency(value: number | null): string {
-  if (value === null || isNaN(value)) return '0.00';
+  if (value === null || Number.isNaN(value)) return '0.00';
   return Number(value).toLocaleString('th-TH', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,

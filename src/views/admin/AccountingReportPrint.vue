@@ -138,7 +138,7 @@ function formatDate(date: Date): string {
   });
 }
 function formatCurrency(value: number | null): string {
-  if (value === null || isNaN(value)) return '0.00';
+  if (value === null || Number.isNaN(value)) return '0.00';
   return Number(value).toLocaleString('th-TH', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,

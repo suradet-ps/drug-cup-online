@@ -120,7 +120,7 @@ async function fetchReportData(): Promise<void> {
     reportData.value = (data ?? []) as unknown as AccountingSummaryRow[];
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    error.value = 'เกิดข้อผิดพลาด: ' + (err instanceof Error ? err.message : String(err));
+    error.value = `เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`;
   } finally {
     loading.value = false;
   }

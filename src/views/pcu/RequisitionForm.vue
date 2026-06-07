@@ -202,7 +202,7 @@ onMounted(async () => {
     }
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    error.value = 'ไม่สามารถโหลดข้อมูลได้: ' + (err instanceof Error ? err.message : String(err));
+    error.value = `ไม่สามารถโหลดข้อมูลได้: ${err instanceof Error ? err.message : String(err)}`;
     console.error(err);
   } finally {
     loading.value = false;
@@ -234,7 +234,7 @@ function updateTotal(): void {
 }
 
 function formatCurrency(value: number | null): string {
-  if (value === null || isNaN(value)) return '0.00';
+  if (value === null || Number.isNaN(value)) return '0.00';
   return Number(value).toLocaleString('th-TH', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -282,19 +282,20 @@ async function saveRequisition(status: RequisitionStatus): Promise<void> {
         // FIX: original used `i.id == itemId` (loose equality);
         // strict TS requires Number() conversion to compare number vs string
         const itemDetails = items.value.find((i) => i.id === Number(itemId));
-        return (
-          entry.quantity > 0 && entry.quantity !== null && itemDetails && itemDetails.is_available
-        );
+        return entry.quantity > 0 && entry.quantity !== null && itemDetails?.is_available;
       })
       .map(([itemId, entry]) => {
         // FIX: same as above
         const itemDetails = items.value.find((i) => i.id === Number(itemId));
+        if (!itemDetails) {
+          throw new Error(`Item ${itemId} not found`);
+        }
         return {
           requisition_id: currentRequisitionId,
           item_id: Number(itemId),
           quantity: entry.quantity,
           on_hand_quantity: entry.onHand,
-          price_at_request: itemDetails!.price_per_unit,
+          price_at_request: itemDetails.price_per_unit,
         };
       });
 
@@ -318,7 +319,7 @@ async function saveRequisition(status: RequisitionStatus): Promise<void> {
     router.push('/pcu/dashboard');
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    alert('เกิดข้อผิดพลาดในการบันทึก: ' + (err instanceof Error ? err.message : String(err)));
+    alert(`เกิดข้อผิดพลาดในการบันทึก: ${err instanceof Error ? err.message : String(err)}`);
     console.error(err);
   } finally {
     isSubmitting.value = false;

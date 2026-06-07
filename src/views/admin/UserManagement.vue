@@ -134,7 +134,7 @@ async function updateUserStatus(
   } catch (err) {
     console.error('Error updating user status:', err);
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    alert('เกิดข้อผิดพลาดในการอัปเดตสถานะ: ' + (err instanceof Error ? err.message : String(err)));
+    alert(`เกิดข้อผิดพลาดในการอัปเดตสถานะ: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
 

@@ -143,13 +143,13 @@ function formatCurrency(value: number): string {
 }
 function bahtText(number: number): string {
   const num = Number(number);
-  if (isNaN(num)) return '';
+  if (Number.isNaN(num)) return '';
   const parts = num.toFixed(2).split('.');
   const integerPart = parts[0] ?? '0';
   const decimalPart = parts[1] ?? '00';
   if (integerPart === '0' && decimalPart === '00') return 'ศูนย์บาทถ้วน';
-  const bahtTextInteger = convert(integerPart) + 'บาท';
-  const bahtTextDecimal = decimalPart === '00' ? 'ถ้วน' : convert(decimalPart) + 'สตางค์';
+  const bahtTextInteger = `${convert(integerPart)}บาท`;
+  const bahtTextDecimal = decimalPart === '00' ? 'ถ้วน' : `${convert(decimalPart)}สตางค์`;
   return bahtTextInteger + bahtTextDecimal;
 }
 function convert(numberString: string): string {
@@ -158,7 +158,7 @@ function convert(numberString: string): string {
   let output = '';
   const len = numberString.length;
   for (let i = 0; i < len; i++) {
-    const digit = parseInt(numberString[i] ?? '0');
+    const digit = parseInt(numberString[i] ?? '0', 10);
     const pos = len - 1 - i;
     if (digit > 0) {
       if (pos === 1 && digit === 1) output += '';

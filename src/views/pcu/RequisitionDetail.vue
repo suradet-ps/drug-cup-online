@@ -133,7 +133,7 @@ onMounted(async () => {
     requisition.value = data as unknown as RequisitionWithJoins;
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    error.value = 'ไม่สามารถโหลดข้อมูลใบเบิกได้: ' + (err instanceof Error ? err.message : String(err));
+    error.value = `ไม่สามารถโหลดข้อมูลใบเบิกได้: ${err instanceof Error ? err.message : String(err)}`;
     console.error(err);
   } finally {
     loading.value = false;
@@ -141,7 +141,7 @@ onMounted(async () => {
 });
 
 const grandTotal = computed<number>(() => {
-  if (!requisition.value || !requisition.value.requisition_items_drugcupsabot) return 0;
+  if (!requisition.value?.requisition_items_drugcupsabot) return 0;
 
   return requisition.value.requisition_items_drugcupsabot.reduce((sum, item) => {
     const quantityToUse = item.approved_quantity ?? item.quantity;
@@ -162,7 +162,7 @@ function formatDate(dateString: string | null): string {
 }
 
 function formatCurrency(value: number | null | undefined): string {
-  if (value === null || value === undefined || isNaN(value)) return '0.00';
+  if (value === null || value === undefined || Number.isNaN(value)) return '0.00';
   return Number(value).toLocaleString('th-TH', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,

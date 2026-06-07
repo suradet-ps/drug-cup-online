@@ -117,8 +117,7 @@ async function fetchSettings(): Promise<void> {
     pcuSettings.value = settings;
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    error.value =
-      'ไม่สามารถโหลดข้อมูลการตั้งค่าได้: ' + (err instanceof Error ? err.message : String(err));
+    error.value = `ไม่สามารถโหลดข้อมูลการตั้งค่าได้: ${err instanceof Error ? err.message : String(err)}`;
     console.error(err);
   } finally {
     loading.value = false;
@@ -145,7 +144,7 @@ async function savePcuPersonnel(pcu: PcuSetting): Promise<void> {
     await fetchSettings();
   } catch (err) {
     // FIX: error is unknown in strict TS, narrow to Error before reading .message
-    alert('เกิดข้อผิดพลาดในการบันทึก: ' + (err instanceof Error ? err.message : String(err)));
+    alert(`เกิดข้อผิดพลาดในการบันทึก: ${err instanceof Error ? err.message : String(err)}`);
     console.error(err);
   }
 }
