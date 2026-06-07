@@ -6,6 +6,28 @@
             >
         </div>
 
+        <div v-if="canPrintOrExport" class="action-toolbar">
+            <button
+                type="button"
+                class="btn btn-secondary"
+                :disabled="exporting"
+                @click="exportToExcel"
+            >
+                <i class="fas fa-file-excel"></i>
+                {{ exporting ? 'กำลังส่งออก...' : 'ส่งออก Excel' }}
+            </button>
+            <router-link
+                :to="{
+                    name: 'PcuPrintRequisition',
+                    query: { id: requisitionId },
+                }"
+                class="btn btn-primary"
+                target="_blank"
+            >
+                <i class="fas fa-print"></i> พิมพ์ใบเบิก
+            </router-link>
+        </div>
+
         <div v-if="loading" class="loading">กำลังโหลดข้อมูลใบเบิก...</div>
         <div v-if="error" class="error">{{ error }}</div>
 
@@ -97,14 +119,24 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { supabase } from '@/supabaseClient';
-import type { RequisitionWithJoins } from '@/types/models';
+import type { RequisitionStatus, RequisitionWithJoins } from '@/types/models';
 
 const props = defineProps<{ requisitionId: string }>();
 
 const route = useRoute();
 const loading = ref<boolean>(true);
 const error = ref<string | null>(null);
+const exporting = ref<boolean>(false);
 const requisition = ref<RequisitionWithJoins | null>(null);
+
+const PRINTABLE_STATUSES: RequisitionStatus[] = ['approved', 'fulfilled'];
+
+const canPrintOrExport = computed<boolean>(() => {
+  return (
+    !!requisition.value &&
+    PRINTABLE_STATUSES.includes(requisition.value.status as RequisitionStatus)
+  );
+});
 
 onMounted(async () => {
   try {
@@ -168,6 +200,45 @@ function formatCurrency(value: number | null | undefined): string {
     maximumFractionDigits: 2,
   });
 }
+
+async function exportToExcel(): Promise<void> {
+  if (!requisition.value || exporting.value) return;
+  exporting.value = true;
+
+  try {
+    // Dynamic import: xlsx (SheetJS) is ~400 kB and only needed when the
+    // user clicks "ส่งออก Excel". Loading it on demand keeps the
+    // initial bundle under the Vite chunk-size warning limit.
+    const { utils, writeFile } = await import('xlsx');
+
+    const pcuName = requisition.value.pcus_drugcupsabot?.name ?? 'ไม่ระบุ';
+    const periodName = requisition.value.requisition_periods_drugcupsabot?.name ?? 'ไม่ระบุ';
+
+    const dataForExport = requisition.value.requisition_items_drugcupsabot.map((item, index) => {
+      const qty = item.approved_quantity ?? item.quantity;
+      return {
+        ลำดับ: index + 1,
+        รายการ: item.items_drugcupsabot.name,
+        หน่วยนับ: item.items_drugcupsabot.unit_pack,
+        จำนวนที่ขอเบิก: item.quantity,
+        จำนวนที่ได้รับอนุมัติ: item.approved_quantity ?? item.quantity,
+        ราคาต่อหน่วย: item.price_at_request,
+        มูลค่ารวม: qty * item.price_at_request,
+      };
+    });
+
+    const worksheet = utils.json_to_sheet(dataForExport);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'ใบเบิก');
+    writeFile(workbook, `ใบเบิก_${pcuName}_${periodName}.xlsx`);
+  } catch (err) {
+    console.error('Error exporting to Excel:', err);
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    alert(`เกิดข้อผิดพลาดในการส่งออก Excel: ${err instanceof Error ? err.message : String(err)}`);
+  } finally {
+    exporting.value = false;
+  }
+}
 </script>
 
 <style scoped>
@@ -190,6 +261,21 @@ function formatCurrency(value: number | null | undefined): string {
 
 .back-link:hover {
     text-decoration: underline;
+}
+
+.action-toolbar {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.action-toolbar .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
 }
 
 .requisition-details h2 {
