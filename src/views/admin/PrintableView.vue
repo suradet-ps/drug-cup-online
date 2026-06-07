@@ -147,24 +147,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { useRoute } from "vue-router";
-import { supabase } from "@/supabaseClient";
-import type { PcuPersonnel } from "@/types/models";
+import { computed, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { supabase } from '@/supabaseClient';
+import type { PcuPersonnel } from '@/types/models';
 
 type PrintRequisitionItem = {
-    quantity: number;
-    approved_quantity: number | null;
-    items_drugcupsabot: { name: string; unit_pack: string };
+  quantity: number;
+  approved_quantity: number | null;
+  items_drugcupsabot: { name: string; unit_pack: string };
 };
 
 type PrintRequisition = {
-    id: number;
-    status: string;
-    submitted_at: string | null;
-    pcus_drugcupsabot: { id: number; name: string };
-    requisition_periods_drugcupsabot: { name: string };
-    requisition_items_drugcupsabot: PrintRequisitionItem[];
+  id: number;
+  status: string;
+  submitted_at: string | null;
+  pcus_drugcupsabot: { id: number; name: string };
+  requisition_periods_drugcupsabot: { name: string };
+  requisition_items_drugcupsabot: PrintRequisitionItem[];
 };
 
 const route = useRoute();
@@ -174,23 +174,22 @@ const loading = ref<boolean>(true);
 const requisitionId = route.query.id as string | undefined;
 
 const emptyRows = computed<number>(() => {
-    if (!requisition.value) return 0;
-    const itemCount = requisition.value.requisition_items_drugcupsabot.length;
-    return Math.max(0, 1 - itemCount);
+  if (!requisition.value) return 0;
+  const itemCount = requisition.value.requisition_items_drugcupsabot.length;
+  return Math.max(0, 1 - itemCount);
 });
 
 onMounted(async () => {
-    if (!requisitionId) {
-        document.body.innerHTML = "ไม่พบ ID ของใบเบิก";
-        return;
-    }
+  if (!requisitionId) {
+    document.body.innerHTML = 'ไม่พบ ID ของใบเบิก';
+    return;
+  }
 
-    try {
-        const { data: requisitionData, error: requisitionError } =
-            await supabase
-                .from("requisitions_drugcupsabot")
-                .select(
-                    `
+  try {
+    const { data: requisitionData, error: requisitionError } = await supabase
+      .from('requisitions_drugcupsabot')
+      .select(
+        `
         id, status, submitted_at,
         pcus_drugcupsabot (id, name),
         requisition_periods_drugcupsabot (name),
@@ -199,50 +198,48 @@ onMounted(async () => {
           items_drugcupsabot (name, unit_pack)
         )
       `,
-                )
-                .eq("id", requisitionId)
-                .single();
+      )
+      .eq('id', requisitionId)
+      .single();
 
-        if (requisitionError) throw requisitionError;
-        // FIX: Supabase types FK joins as arrays even for many-to-one
-        requisition.value =
-            requisitionData as unknown as PrintRequisition;
+    if (requisitionError) throw requisitionError;
+    // FIX: Supabase types FK joins as arrays even for many-to-one
+    requisition.value = requisitionData as unknown as PrintRequisition;
 
-        if (requisitionData && requisitionData.pcus_drugcupsabot?.id) {
-            const pcuId = requisitionData.pcus_drugcupsabot.id;
-            const { data: personnelData, error: personnelError } =
-                await supabase
-                    .from("pcu_personnel_drugcupsabot")
-                    .select("*")
-                    .eq("pcu_id", pcuId)
-                    .single();
+    if (requisitionData && requisitionData.pcus_drugcupsabot?.id) {
+      const pcuId = requisitionData.pcus_drugcupsabot.id;
+      const { data: personnelData, error: personnelError } = await supabase
+        .from('pcu_personnel_drugcupsabot')
+        .select('*')
+        .eq('pcu_id', pcuId)
+        .single();
 
-            if (personnelError && personnelError.code !== "PGRST116") {
-                throw personnelError;
-            }
+      if (personnelError && personnelError.code !== 'PGRST116') {
+        throw personnelError;
+      }
 
-            personnel.value = (personnelData ?? null) as unknown as PcuPersonnel;
-        }
-
-        setTimeout(() => {
-            window.print();
-        }, 500);
-    } catch (err) {
-        console.error("Error fetching data for printing:", err);
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        document.body.innerHTML = `เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`;
-    } finally {
-        loading.value = false;
+      personnel.value = (personnelData ?? null) as unknown as PcuPersonnel;
     }
+
+    setTimeout(() => {
+      window.print();
+    }, 500);
+  } catch (err) {
+    console.error('Error fetching data for printing:', err);
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    document.body.innerHTML = `เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`;
+  } finally {
+    loading.value = false;
+  }
 });
 
 function formatDate(dateString: string | Date): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("th-TH", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
+  const date = new Date(dateString);
+  return date.toLocaleDateString('th-TH', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 </script>
 

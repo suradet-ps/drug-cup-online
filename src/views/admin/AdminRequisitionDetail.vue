@@ -140,17 +140,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { supabase } from "@/supabaseClient";
-import type { RequisitionWithJoins } from "@/types/models";
+import { computed, onMounted, ref } from 'vue';
+import { supabase } from '@/supabaseClient';
+import type { RequisitionWithJoins } from '@/types/models';
 
 type EditableItem = {
-    id: number;
-    quantity: number;
-    on_hand_quantity: number | null;
-    approved_quantity: number;
-    price_at_request: number;
-    items_drugcupsabot: { name: string; unit_pack: string };
+  id: number;
+  quantity: number;
+  on_hand_quantity: number | null;
+  approved_quantity: number;
+  price_at_request: number;
+  items_drugcupsabot: { name: string; unit_pack: string };
 };
 
 const props = defineProps<{ requisitionId: string }>();
@@ -162,14 +162,14 @@ const editableItems = ref<EditableItem[]>([]);
 const isUpdating = ref<boolean>(false);
 
 async function fetchRequisition(): Promise<void> {
-    try {
-        loading.value = true;
-        error.value = null;
+  try {
+    loading.value = true;
+    error.value = null;
 
-        const { data, error: fetchError } = await supabase
-            .from("requisitions_drugcupsabot")
-            .select(
-                `
+    const { data, error: fetchError } = await supabase
+      .from('requisitions_drugcupsabot')
+      .select(
+        `
         *,
         pcus_drugcupsabot(name),
         requisition_periods_drugcupsabot(name),
@@ -178,128 +178,111 @@ async function fetchRequisition(): Promise<void> {
           items_drugcupsabot(name, unit_pack)
         )
       `,
-            )
-            .eq("id", props.requisitionId)
-            .single();
+      )
+      .eq('id', props.requisitionId)
+      .single();
 
-        if (fetchError) throw fetchError;
+    if (fetchError) throw fetchError;
 
-        // FIX: Supabase types FK joins as arrays even for many-to-one
-        requisition.value = data as unknown as RequisitionWithJoins;
+    // FIX: Supabase types FK joins as arrays even for many-to-one
+    requisition.value = data as unknown as RequisitionWithJoins;
 
-        editableItems.value = (data.requisition_items_drugcupsabot as unknown as EditableItem[]).map(
-            (item) => ({
-                ...item,
-                approved_quantity: item.approved_quantity ?? item.quantity,
-            }),
-        );
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        error.value =
-            "ไม่สามารถโหลดข้อมูลได้: " +
-            (err instanceof Error ? err.message : String(err));
-        console.error(err);
-    } finally {
-        loading.value = false;
-    }
+    editableItems.value = (data.requisition_items_drugcupsabot as unknown as EditableItem[]).map(
+      (item) => ({
+        ...item,
+        approved_quantity: item.approved_quantity ?? item.quantity,
+      }),
+    );
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    error.value = 'ไม่สามารถโหลดข้อมูลได้: ' + (err instanceof Error ? err.message : String(err));
+    console.error(err);
+  } finally {
+    loading.value = false;
+  }
 }
 
 onMounted(fetchRequisition);
 
 const grandTotalApproved = computed<number>(() => {
-    if (!editableItems.value) return 0;
-    return editableItems.value.reduce((sum, item) => {
-        const quantity = item.approved_quantity || 0;
-        const price = item.price_at_request || 0;
-        return sum + Number(quantity) * Number(price);
-    }, 0);
+  if (!editableItems.value) return 0;
+  return editableItems.value.reduce((sum, item) => {
+    const quantity = item.approved_quantity || 0;
+    const price = item.price_at_request || 0;
+    return sum + Number(quantity) * Number(price);
+  }, 0);
 });
 
 async function saveAndApprove(): Promise<void> {
-    if (
-        !confirm(
-            "ยืนยันการบันทึกและอนุมัติใบเบิกนี้? การกระทำนี้จะอัปเดตจำนวนที่อนุมัติทั้งหมด",
-        )
-    )
-        return;
+  if (!confirm('ยืนยันการบันทึกและอนุมัติใบเบิกนี้? การกระทำนี้จะอัปเดตจำนวนที่อนุมัติทั้งหมด')) return;
 
-    isUpdating.value = true;
-    try {
-        const itemsToUpdate = editableItems.value.map((item) => ({
-            id: item.id,
-            approved_quantity: item.approved_quantity || 0,
-        }));
+  isUpdating.value = true;
+  try {
+    const itemsToUpdate = editableItems.value.map((item) => ({
+      id: item.id,
+      approved_quantity: item.approved_quantity || 0,
+    }));
 
-        const { error: rpcError } = await supabase.rpc(
-            "update_approved_quantities",
-            {
-                items_data: itemsToUpdate,
-            },
-        );
-        if (rpcError) throw rpcError;
+    const { error: rpcError } = await supabase.rpc('update_approved_quantities', {
+      items_data: itemsToUpdate,
+    });
+    if (rpcError) throw rpcError;
 
-        const { error: reqError } = await supabase
-            .from("requisitions_drugcupsabot")
-            .update({ status: "approved" })
-            .eq("id", props.requisitionId);
-        if (reqError) throw reqError;
+    const { error: reqError } = await supabase
+      .from('requisitions_drugcupsabot')
+      .update({ status: 'approved' })
+      .eq('id', props.requisitionId);
+    if (reqError) throw reqError;
 
-        alert("บันทึกและอนุมัติใบเบิกเรียบร้อย");
-        await fetchRequisition();
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        alert(
-            "เกิดข้อผิดพลาด: " +
-                (err instanceof Error ? err.message : String(err)),
-        );
-        console.error(err);
-    } finally {
-        isUpdating.value = false;
-    }
+    alert('บันทึกและอนุมัติใบเบิกเรียบร้อย');
+    await fetchRequisition();
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    alert('เกิดข้อผิดพลาด: ' + (err instanceof Error ? err.message : String(err)));
+    console.error(err);
+  } finally {
+    isUpdating.value = false;
+  }
 }
 
 async function fulfillRequisition(): Promise<void> {
-    if (!confirm("ยืนยันการจ่ายเวชภัณฑ์ตามจำนวนที่อนุมัติแล้วใช่หรือไม่?"))
-        return;
+  if (!confirm('ยืนยันการจ่ายเวชภัณฑ์ตามจำนวนที่อนุมัติแล้วใช่หรือไม่?')) return;
 
-    isUpdating.value = true;
-    try {
-        const { error: reqError } = await supabase
-            .from("requisitions_drugcupsabot")
-            .update({ status: "fulfilled" })
-            .eq("id", props.requisitionId);
-        if (reqError) throw reqError;
+  isUpdating.value = true;
+  try {
+    const { error: reqError } = await supabase
+      .from('requisitions_drugcupsabot')
+      .update({ status: 'fulfilled' })
+      .eq('id', props.requisitionId);
+    if (reqError) throw reqError;
 
-        alert("ยืนยันการจ่ายเวชภัณฑ์เรียบร้อย");
-        await fetchRequisition();
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        alert(
-            "เกิดข้อผิดพลาด: " +
-                (err instanceof Error ? err.message : String(err)),
-        );
-        console.error(err);
-    } finally {
-        isUpdating.value = false;
-    }
+    alert('ยืนยันการจ่ายเวชภัณฑ์เรียบร้อย');
+    await fetchRequisition();
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    alert('เกิดข้อผิดพลาด: ' + (err instanceof Error ? err.message : String(err)));
+    console.error(err);
+  } finally {
+    isUpdating.value = false;
+  }
 }
 
 function formatDate(dateString: string | null): string {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleString("th-TH", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+  if (!dateString) return 'N/A';
+  return new Date(dateString).toLocaleString('th-TH', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 function formatCurrency(value: number | null): string {
-    if (value === null || isNaN(value)) return "0.00";
-    return Number(value).toLocaleString("th-TH", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+  if (value === null || isNaN(value)) return '0.00';
+  return Number(value).toLocaleString('th-TH', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 </script>
 

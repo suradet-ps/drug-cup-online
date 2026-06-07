@@ -86,70 +86,63 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { useRoute } from "vue-router";
-import { supabase } from "@/supabaseClient";
-import type {
-    AccountingSummaryRow,
-    RequisitionPeriod,
-} from "@/types/models";
+import { computed, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { supabase } from '@/supabaseClient';
+import type { AccountingSummaryRow, RequisitionPeriod } from '@/types/models';
 
 const route = useRoute();
 const loading = ref<boolean>(true);
 const reportData = ref<AccountingSummaryRow[]>([]);
-const periodInfo = ref<Pick<RequisitionPeriod, "name"> | null>(null);
+const periodInfo = ref<Pick<RequisitionPeriod, 'name'> | null>(null);
 const periodId = route.query.periodId as string | undefined;
 
 const grandTotal = computed<number>(() => {
-    return reportData.value.reduce((sum, pcu) => sum + pcu.total_value, 0);
+  return reportData.value.reduce((sum, pcu) => sum + pcu.total_value, 0);
 });
 
 onMounted(async () => {
-    if (!periodId) {
-        document.body.innerHTML = "ไม่พบ ID ของรอบเบิก";
-        return;
-    }
-    try {
-        const { data: periodData } = await supabase
-            .from("requisition_periods_drugcupsabot")
-            .select("name")
-            .eq("id", periodId)
-            .single();
-        periodInfo.value = periodData;
+  if (!periodId) {
+    document.body.innerHTML = 'ไม่พบ ID ของรอบเบิก';
+    return;
+  }
+  try {
+    const { data: periodData } = await supabase
+      .from('requisition_periods_drugcupsabot')
+      .select('name')
+      .eq('id', periodId)
+      .single();
+    periodInfo.value = periodData;
 
-        const { data, error: fetchError } = await supabase.rpc(
-            "get_accounting_summary_by_period",
-            {
-                period_id_param: periodId,
-            },
-        );
-        if (fetchError) throw fetchError;
-        reportData.value =
-            (data ?? []) as unknown as AccountingSummaryRow[];
+    const { data, error: fetchError } = await supabase.rpc('get_accounting_summary_by_period', {
+      period_id_param: periodId,
+    });
+    if (fetchError) throw fetchError;
+    reportData.value = (data ?? []) as unknown as AccountingSummaryRow[];
 
-        setTimeout(() => window.print(), 500);
-    } catch (err) {
-        console.error("Error fetching print data:", err);
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        document.body.innerHTML = `เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`;
-    } finally {
-        loading.value = false;
-    }
+    setTimeout(() => window.print(), 500);
+  } catch (err) {
+    console.error('Error fetching print data:', err);
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    document.body.innerHTML = `เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`;
+  } finally {
+    loading.value = false;
+  }
 });
 
 function formatDate(date: Date): string {
-    return date.toLocaleDateString("th-TH", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
+  return date.toLocaleDateString('th-TH', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 function formatCurrency(value: number | null): string {
-    if (value === null || isNaN(value)) return "0.00";
-    return Number(value).toLocaleString("th-TH", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+  if (value === null || isNaN(value)) return '0.00';
+  return Number(value).toLocaleString('th-TH', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 </script>
 

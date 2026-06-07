@@ -48,26 +48,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useAuthStore } from "@/store/auth";
-import { useRouter } from "vue-router";
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/store/auth';
 
 const auth = useAuthStore();
 const router = useRouter();
 const isMenuOpen = ref(false);
 
 function toggleMenu(): void {
-    isMenuOpen.value = !isMenuOpen.value;
+  isMenuOpen.value = !isMenuOpen.value;
 }
 
 function closeMenu(): void {
-    isMenuOpen.value = false;
+  isMenuOpen.value = false;
 }
 
 async function handleLogout(): Promise<void> {
-    await auth.logout();
-    closeMenu();
-    router.push("/login");
+  await auth.logout();
+  closeMenu();
+  router.push('/login');
 }
 </script>
 

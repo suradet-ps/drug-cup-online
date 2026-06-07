@@ -27,14 +27,14 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "@/store/auth";
-import { useRouter } from "vue-router";
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/store/auth';
 
 const auth = useAuthStore();
 const router = useRouter();
 
 function goTo(path: string): void {
-    router.push(path);
+  router.push(path);
 }
 </script>
 

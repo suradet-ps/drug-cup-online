@@ -63,16 +63,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { supabase } from "@/supabaseClient";
-import type { ProfileStatus } from "@/types/models";
+import { onMounted, ref } from 'vue';
+import { supabase } from '@/supabaseClient';
+import type { ProfileStatus } from '@/types/models';
 
 type PendingUser = {
-    id: string;
-    username: string;
-    email: string;
-    created_at: string;
-    pcus_drugcupsabot: { name: string } | null;
+  id: string;
+  username: string;
+  email: string;
+  created_at: string;
+  pcus_drugcupsabot: { name: string } | null;
 };
 
 const loading = ref<boolean>(true);
@@ -80,78 +80,73 @@ const error = ref<string | null>(null);
 const pendingUsers = ref<PendingUser[]>([]);
 
 async function fetchPendingUsers(): Promise<void> {
-    loading.value = true;
-    error.value = null;
-    try {
-        const { data, error: fetchError } = await supabase
-            .from("profiles_drugcupsabot")
-            .select(
-                `
+  loading.value = true;
+  error.value = null;
+  try {
+    const { data, error: fetchError } = await supabase
+      .from('profiles_drugcupsabot')
+      .select(
+        `
         id,
         username,
         email,
         created_at,
         pcus_drugcupsabot ( name )
       `,
-            )
-            .eq("status", "pending");
+      )
+      .eq('status', 'pending');
 
-        if (fetchError) throw fetchError;
-        // FIX: Supabase types FK joins as arrays even for many-to-one
-        pendingUsers.value = (data ?? []) as unknown as PendingUser[];
-    } catch (err) {
-        console.error("Error fetching pending users:", err);
-        error.value = "ไม่สามารถโหลดข้อมูลผู้ใช้ที่รอการอนุมัติได้";
-    } finally {
-        loading.value = false;
-    }
+    if (fetchError) throw fetchError;
+    // FIX: Supabase types FK joins as arrays even for many-to-one
+    pendingUsers.value = (data ?? []) as unknown as PendingUser[];
+  } catch (err) {
+    console.error('Error fetching pending users:', err);
+    error.value = 'ไม่สามารถโหลดข้อมูลผู้ใช้ที่รอการอนุมัติได้';
+  } finally {
+    loading.value = false;
+  }
 }
 
 onMounted(() => {
-    fetchPendingUsers();
+  fetchPendingUsers();
 });
 
 async function updateUserStatus(
-    userId: string,
-    newStatus: Exclude<ProfileStatus, "pending">,
+  userId: string,
+  newStatus: Exclude<ProfileStatus, 'pending'>,
 ): Promise<void> {
-    const confirmationText =
-        newStatus === "approved"
-            ? "คุณต้องการอนุมัติผู้ใช้งานนี้ใช่หรือไม่?"
-            : "คุณต้องการปฏิเสธผู้ใช้งานนี้ใช่หรือไม่?";
+  const confirmationText =
+    newStatus === 'approved' ? 'คุณต้องการอนุมัติผู้ใช้งานนี้ใช่หรือไม่?' : 'คุณต้องการปฏิเสธผู้ใช้งานนี้ใช่หรือไม่?';
 
-    if (!confirm(confirmationText)) return;
+  if (!confirm(confirmationText)) return;
 
-    try {
-        const { error: updateError } = await supabase
-            .from("profiles_drugcupsabot")
-            .update({ status: newStatus })
-            .eq("id", userId);
+  try {
+    const { error: updateError } = await supabase
+      .from('profiles_drugcupsabot')
+      .update({ status: newStatus })
+      .eq('id', userId);
 
-        if (updateError) throw updateError;
+    if (updateError) throw updateError;
 
-        alert(`อัปเดตสถานะผู้ใช้เรียบร้อยแล้ว`);
+    alert(`อัปเดตสถานะผู้ใช้เรียบร้อยแล้ว`);
 
-        await fetchPendingUsers();
-    } catch (err) {
-        console.error("Error updating user status:", err);
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        alert(
-            "เกิดข้อผิดพลาดในการอัปเดตสถานะ: " +
-                (err instanceof Error ? err.message : String(err)),
-        );
-    }
+    await fetchPendingUsers();
+  } catch (err) {
+    console.error('Error updating user status:', err);
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    alert('เกิดข้อผิดพลาดในการอัปเดตสถานะ: ' + (err instanceof Error ? err.message : String(err)));
+  }
 }
 
 function formatDate(dateString: string | null): string {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleString("th-TH", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+  if (!dateString) return 'N/A';
+  return new Date(dateString).toLocaleString('th-TH', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 </script>
 

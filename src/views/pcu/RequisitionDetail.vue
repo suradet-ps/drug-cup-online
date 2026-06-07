@@ -94,10 +94,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { useRoute } from "vue-router";
-import { supabase } from "@/supabaseClient";
-import type { RequisitionWithJoins } from "@/types/models";
+import { computed, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { supabase } from '@/supabaseClient';
+import type { RequisitionWithJoins } from '@/types/models';
 
 const props = defineProps<{ requisitionId: string }>();
 
@@ -107,11 +107,11 @@ const error = ref<string | null>(null);
 const requisition = ref<RequisitionWithJoins | null>(null);
 
 onMounted(async () => {
-    try {
-        const { data, error: fetchError } = await supabase
-            .from("requisitions_drugcupsabot")
-            .select(
-                `
+  try {
+    const { data, error: fetchError } = await supabase
+      .from('requisitions_drugcupsabot')
+      .select(
+        `
         *,
         requisition_periods_drugcupsabot ( name ),
         requisition_items_drugcupsabot (
@@ -119,61 +119,54 @@ onMounted(async () => {
           items_drugcupsabot ( name, unit_pack )
         )
       `,
-            )
-            .eq("id", props.requisitionId)
-            .single();
+      )
+      .eq('id', props.requisitionId)
+      .single();
 
-        if (fetchError) {
-            if (fetchError.code === "PGRST116") {
-                throw new Error("ไม่พบข้อมูลใบเบิก หรือคุณไม่มีสิทธิ์เข้าถึง");
-            }
-            throw fetchError;
-        }
-        // FIX: Supabase types FK joins as arrays even for many-to-one
-        requisition.value = data as unknown as RequisitionWithJoins;
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        error.value =
-            "ไม่สามารถโหลดข้อมูลใบเบิกได้: " +
-            (err instanceof Error ? err.message : String(err));
-        console.error(err);
-    } finally {
-        loading.value = false;
+    if (fetchError) {
+      if (fetchError.code === 'PGRST116') {
+        throw new Error('ไม่พบข้อมูลใบเบิก หรือคุณไม่มีสิทธิ์เข้าถึง');
+      }
+      throw fetchError;
     }
+    // FIX: Supabase types FK joins as arrays even for many-to-one
+    requisition.value = data as unknown as RequisitionWithJoins;
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    error.value = 'ไม่สามารถโหลดข้อมูลใบเบิกได้: ' + (err instanceof Error ? err.message : String(err));
+    console.error(err);
+  } finally {
+    loading.value = false;
+  }
 });
 
 const grandTotal = computed<number>(() => {
-    if (!requisition.value || !requisition.value.requisition_items_drugcupsabot)
-        return 0;
+  if (!requisition.value || !requisition.value.requisition_items_drugcupsabot) return 0;
 
-    return requisition.value.requisition_items_drugcupsabot.reduce(
-        (sum, item) => {
-            const quantityToUse = item.approved_quantity ?? item.quantity;
-            const itemTotal =
-                Number(quantityToUse) * Number(item.price_at_request);
-            return sum + itemTotal;
-        },
-        0,
-    );
+  return requisition.value.requisition_items_drugcupsabot.reduce((sum, item) => {
+    const quantityToUse = item.approved_quantity ?? item.quantity;
+    const itemTotal = Number(quantityToUse) * Number(item.price_at_request);
+    return sum + itemTotal;
+  }, 0);
 });
 
 function formatDate(dateString: string | null): string {
-    if (!dateString) return "ยังไม่ได้ส่ง";
-    return new Date(dateString).toLocaleString("th-TH", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+  if (!dateString) return 'ยังไม่ได้ส่ง';
+  return new Date(dateString).toLocaleString('th-TH', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 function formatCurrency(value: number | null | undefined): string {
-    if (value === null || value === undefined || isNaN(value)) return "0.00";
-    return Number(value).toLocaleString("th-TH", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+  if (value === null || value === undefined || isNaN(value)) return '0.00';
+  return Number(value).toLocaleString('th-TH', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 </script>
 

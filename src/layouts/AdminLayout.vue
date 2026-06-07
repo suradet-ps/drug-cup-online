@@ -44,22 +44,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import Sidebar from "@/components/Sidebar.vue";
-import { useAuthStore } from "@/store/auth";
-import { useRouter } from "vue-router";
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import Sidebar from '@/components/Sidebar.vue';
+import { useAuthStore } from '@/store/auth';
 
 const auth = useAuthStore();
 const router = useRouter();
 
 const isSidebarOpen = ref(false);
 function toggleSidebar() {
-    isSidebarOpen.value = !isSidebarOpen.value;
+  isSidebarOpen.value = !isSidebarOpen.value;
 }
 
 async function handleLogout(): Promise<void> {
-    await auth.logout();
-    router.push("/login");
+  await auth.logout();
+  router.push('/login');
 }
 </script>
 

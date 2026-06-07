@@ -139,28 +139,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { useRouter } from "vue-router";
-import { supabase } from "@/supabaseClient";
-import type {
-    RequisitionPeriod,
-    RequisitionStatus,
-} from "@/types/models";
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { supabase } from '@/supabaseClient';
+import type { RequisitionPeriod, RequisitionStatus } from '@/types/models';
 
 type ReportItem = {
-    id: number;
-    quantity: number;
-    approved_quantity: number | null;
-    price_at_request: number;
-    items_drugcupsabot: { name: string; unit_pack: string };
+  id: number;
+  quantity: number;
+  approved_quantity: number | null;
+  price_at_request: number;
+  items_drugcupsabot: { name: string; unit_pack: string };
 };
 
 type ReportRequisition = {
-    id: number;
-    status: RequisitionStatus;
-    pcus_drugcupsabot: { name: string };
-    requisition_periods_drugcupsabot: { name: string };
-    requisition_items_drugcupsabot: ReportItem[];
+  id: number;
+  status: RequisitionStatus;
+  pcus_drugcupsabot: { name: string };
+  requisition_periods_drugcupsabot: { name: string };
+  requisition_items_drugcupsabot: ReportItem[];
 };
 
 const router = useRouter();
@@ -172,45 +169,38 @@ const selectedPeriod = ref<number | null>(null);
 const selectedRequisition = ref<ReportRequisition | null>(null);
 
 const grandTotal = computed<number>(() => {
-    if (!selectedRequisition.value) return 0;
-    return selectedRequisition.value.requisition_items_drugcupsabot.reduce(
-        (sum, item) => {
-            const quantityToUse = item.approved_quantity ?? item.quantity;
-            const itemTotal =
-                Number(quantityToUse) * Number(item.price_at_request);
-            return sum + itemTotal;
-        },
-        0,
-    );
+  if (!selectedRequisition.value) return 0;
+  return selectedRequisition.value.requisition_items_drugcupsabot.reduce((sum, item) => {
+    const quantityToUse = item.approved_quantity ?? item.quantity;
+    const itemTotal = Number(quantityToUse) * Number(item.price_at_request);
+    return sum + itemTotal;
+  }, 0);
 });
 
 onMounted(async () => {
-    try {
-        const { data } = await supabase
-            .from("requisition_periods_drugcupsabot")
-            .select("id, name")
-            .order("start_date", { ascending: false });
-        periods.value = (data ?? []) as unknown as RequisitionPeriod[];
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        console.error(
-            "Error fetching periods:",
-            err instanceof Error ? err.message : String(err),
-        );
-    }
+  try {
+    const { data } = await supabase
+      .from('requisition_periods_drugcupsabot')
+      .select('id, name')
+      .order('start_date', { ascending: false });
+    periods.value = (data ?? []) as unknown as RequisitionPeriod[];
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    console.error('Error fetching periods:', err instanceof Error ? err.message : String(err));
+  }
 });
 
 async function fetchRequisitionsForPeriod(): Promise<void> {
-    selectedRequisition.value = null;
-    requisitionsInPeriod.value = [];
-    if (!selectedPeriod.value) return;
+  selectedRequisition.value = null;
+  requisitionsInPeriod.value = [];
+  if (!selectedPeriod.value) return;
 
-    loading.value = true;
-    try {
-        const { data, error } = await supabase
-            .from("requisitions_drugcupsabot")
-            .select(
-                `
+  loading.value = true;
+  try {
+    const { data, error } = await supabase
+      .from('requisitions_drugcupsabot')
+      .select(
+        `
         id, status,
         pcus_drugcupsabot (name),
         requisition_periods_drugcupsabot (name),
@@ -219,80 +209,75 @@ async function fetchRequisitionsForPeriod(): Promise<void> {
           items_drugcupsabot (name, unit_pack)
         )
       `,
-            )
-            .in("status", ["approved", "fulfilled"])
-            .eq("period_id", selectedPeriod.value);
+      )
+      .in('status', ['approved', 'fulfilled'])
+      .eq('period_id', selectedPeriod.value);
 
-        if (error) throw error;
-        // FIX: Supabase types FK joins as arrays even for many-to-one
-        requisitionsInPeriod.value =
-            (data ?? []) as unknown as ReportRequisition[];
-    } catch (err) {
-        console.error("Error fetching requisitions:", err);
-        alert("ไม่สามารถโหลดข้อมูลใบเบิกได้");
-    } finally {
-        loading.value = false;
-    }
+    if (error) throw error;
+    // FIX: Supabase types FK joins as arrays even for many-to-one
+    requisitionsInPeriod.value = (data ?? []) as unknown as ReportRequisition[];
+  } catch (err) {
+    console.error('Error fetching requisitions:', err);
+    alert('ไม่สามารถโหลดข้อมูลใบเบิกได้');
+  } finally {
+    loading.value = false;
+  }
 }
 
 function printDocument(): void {
-    if (!selectedRequisition.value) {
-        alert("กรุณาเลือกใบเบิกที่ต้องการพิมพ์");
-        return;
-    }
-    isGenerating.value = true;
+  if (!selectedRequisition.value) {
+    alert('กรุณาเลือกใบเบิกที่ต้องการพิมพ์');
+    return;
+  }
+  isGenerating.value = true;
 
-    const routeData = router.resolve({
-        name: "PrintRequisition",
-        query: { id: selectedRequisition.value.id },
-    });
+  const routeData = router.resolve({
+    name: 'PrintRequisition',
+    query: { id: selectedRequisition.value.id },
+  });
 
-    window.open(routeData.href, "_blank");
+  window.open(routeData.href, '_blank');
 
-    setTimeout(() => {
-        isGenerating.value = false;
-    }, 1000);
+  setTimeout(() => {
+    isGenerating.value = false;
+  }, 1000);
 }
 
 async function exportToExcel(): Promise<void> {
-    if (!selectedRequisition.value) return;
+  if (!selectedRequisition.value) return;
 
-    // Dynamic import: xlsx (SheetJS) is ~400 kB and only needed when the
-    // user clicks "ส่งออกเป็น Excel". Loading it on demand keeps the
-    // initial bundle under the Vite chunk-size warning limit.
-    const { utils, writeFile } = await import("xlsx");
+  // Dynamic import: xlsx (SheetJS) is ~400 kB and only needed when the
+  // user clicks "ส่งออกเป็น Excel". Loading it on demand keeps the
+  // initial bundle under the Vite chunk-size warning limit.
+  const { utils, writeFile } = await import('xlsx');
 
-    const pcuName = selectedRequisition.value.pcus_drugcupsabot.name;
-    const periodName =
-        selectedRequisition.value.requisition_periods_drugcupsabot.name;
+  const pcuName = selectedRequisition.value.pcus_drugcupsabot.name;
+  const periodName = selectedRequisition.value.requisition_periods_drugcupsabot.name;
 
-    const dataForExport =
-        selectedRequisition.value.requisition_items_drugcupsabot.map(
-            (item, index) => ({
-                ลำดับ: index + 1,
-                รายการ: item.items_drugcupsabot.name,
-                หน่วยนับ: item.items_drugcupsabot.unit_pack,
-                จำนวนที่ขอ: item.quantity,
-                จำนวนที่อนุมัติ: item.approved_quantity ?? item.quantity,
-                ราคาต่อหน่วย: item.price_at_request,
-                มูลค่ารวม:
-                    (item.approved_quantity ?? item.quantity) *
-                    item.price_at_request,
-            }),
-        );
+  const dataForExport = selectedRequisition.value.requisition_items_drugcupsabot.map(
+    (item, index) => ({
+      ลำดับ: index + 1,
+      รายการ: item.items_drugcupsabot.name,
+      หน่วยนับ: item.items_drugcupsabot.unit_pack,
+      จำนวนที่ขอ: item.quantity,
+      จำนวนที่อนุมัติ: item.approved_quantity ?? item.quantity,
+      ราคาต่อหน่วย: item.price_at_request,
+      มูลค่ารวม: (item.approved_quantity ?? item.quantity) * item.price_at_request,
+    }),
+  );
 
-    const worksheet = utils.json_to_sheet(dataForExport);
-    const workbook = utils.book_new();
-    utils.book_append_sheet(workbook, worksheet, `ใบเบิก ${pcuName}`);
-    writeFile(workbook, `ใบเบิก_${pcuName}_${periodName}.xlsx`);
+  const worksheet = utils.json_to_sheet(dataForExport);
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, `ใบเบิก ${pcuName}`);
+  writeFile(workbook, `ใบเบิก_${pcuName}_${periodName}.xlsx`);
 }
 
 function formatCurrency(value: number | null | undefined): string {
-    if (value === null || value === undefined || isNaN(value)) return "0.00";
-    return Number(value).toLocaleString("th-TH", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+  if (value === null || value === undefined || isNaN(value)) return '0.00';
+  return Number(value).toLocaleString('th-TH', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 </script>
 

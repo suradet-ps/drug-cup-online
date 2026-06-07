@@ -50,30 +50,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useAuthStore } from "@/store/auth";
-import { useRouter } from "vue-router";
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/store/auth';
 
-const email = ref<string>("");
-const password = ref<string>("");
+const email = ref<string>('');
+const password = ref<string>('');
 const loading = ref<boolean>(false);
-const errorMessage = ref<string>("");
+const errorMessage = ref<string>('');
 const authStore = useAuthStore();
 const router = useRouter();
 
 async function handleLogin(): Promise<void> {
-    loading.value = true;
-    errorMessage.value = "";
-    try {
-        await authStore.login(email.value, password.value);
-        router.push("/");
-    } catch (error) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        errorMessage.value =
-            error instanceof Error ? error.message : String(error);
-    } finally {
-        loading.value = false;
-    }
+  loading.value = true;
+  errorMessage.value = '';
+  try {
+    await authStore.login(email.value, password.value);
+    router.push('/');
+  } catch (error) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    errorMessage.value = error instanceof Error ? error.message : String(error);
+  } finally {
+    loading.value = false;
+  }
 }
 </script>
 

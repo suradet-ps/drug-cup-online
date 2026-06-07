@@ -80,113 +80,95 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { useRoute } from "vue-router";
-import { supabase } from "@/supabaseClient";
-import type {
-    AccountingSummaryRow,
-    RequisitionPeriod,
-} from "@/types/models";
+import { computed, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { supabase } from '@/supabaseClient';
+import type { AccountingSummaryRow, RequisitionPeriod } from '@/types/models';
 
 const route = useRoute();
 const loading = ref<boolean>(true);
-const periodInfo = ref<Pick<RequisitionPeriod, "name"> | null>(null);
+const periodInfo = ref<Pick<RequisitionPeriod, 'name'> | null>(null);
 const reportData = ref<AccountingSummaryRow[]>([]);
 const periodId = route.query.periodId as string | undefined;
 
 const grandTotal = computed<number>(() =>
-    reportData.value.reduce((sum, pcu) => sum + pcu.total_value, 0),
+  reportData.value.reduce((sum, pcu) => sum + pcu.total_value, 0),
 );
 
 onMounted(async () => {
-    if (!periodId) {
-        document.body.innerHTML = "ไม่พบ ID ของรอบเบิก";
-        return;
-    }
-    try {
-        const { data: periodData } = await supabase
-            .from("requisition_periods_drugcupsabot")
-            .select("name")
-            .eq("id", periodId)
-            .single();
+  if (!periodId) {
+    document.body.innerHTML = 'ไม่พบ ID ของรอบเบิก';
+    return;
+  }
+  try {
+    const { data: periodData } = await supabase
+      .from('requisition_periods_drugcupsabot')
+      .select('name')
+      .eq('id', periodId)
+      .single();
 
-        periodInfo.value = periodData;
+    periodInfo.value = periodData;
 
-        const { data, error } = await supabase.rpc(
-            "get_accounting_summary_by_period",
-            {
-                period_id_param: periodId,
-            },
-        );
-        if (error) throw error;
+    const { data, error } = await supabase.rpc('get_accounting_summary_by_period', {
+      period_id_param: periodId,
+    });
+    if (error) throw error;
 
-        const sorted = ((data ?? []) as unknown as AccountingSummaryRow[]).sort(
-            (a, b) => a.pcu_name.localeCompare(b.pcu_name, "th"),
-        );
-        reportData.value = sorted;
+    const sorted = ((data ?? []) as unknown as AccountingSummaryRow[]).sort((a, b) =>
+      a.pcu_name.localeCompare(b.pcu_name, 'th'),
+    );
+    reportData.value = sorted;
 
-        setTimeout(() => window.print(), 500);
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        document.body.innerHTML = `เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`;
-    } finally {
-        loading.value = false;
-    }
+    setTimeout(() => window.print(), 500);
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    document.body.innerHTML = `เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`;
+  } finally {
+    loading.value = false;
+  }
 });
 
 function formatDate(date: Date): string {
-    return date.toLocaleDateString("th-TH", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
+  return date.toLocaleDateString('th-TH', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 function formatCurrency(value: number): string {
-    return Number(value).toLocaleString("th-TH", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+  return Number(value).toLocaleString('th-TH', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 function bahtText(number: number): string {
-    const num = Number(number);
-    if (isNaN(num)) return "";
-    const parts = num.toFixed(2).split(".");
-    const integerPart = parts[0] ?? "0";
-    const decimalPart = parts[1] ?? "00";
-    if (integerPart === "0" && decimalPart === "00") return "ศูนย์บาทถ้วน";
-    const bahtTextInteger = convert(integerPart) + "บาท";
-    const bahtTextDecimal =
-        decimalPart === "00" ? "ถ้วน" : convert(decimalPart) + "สตางค์";
-    return bahtTextInteger + bahtTextDecimal;
+  const num = Number(number);
+  if (isNaN(num)) return '';
+  const parts = num.toFixed(2).split('.');
+  const integerPart = parts[0] ?? '0';
+  const decimalPart = parts[1] ?? '00';
+  if (integerPart === '0' && decimalPart === '00') return 'ศูนย์บาทถ้วน';
+  const bahtTextInteger = convert(integerPart) + 'บาท';
+  const bahtTextDecimal = decimalPart === '00' ? 'ถ้วน' : convert(decimalPart) + 'สตางค์';
+  return bahtTextInteger + bahtTextDecimal;
 }
 function convert(numberString: string): string {
-    const txtNumArr = [
-        "",
-        "หนึ่ง",
-        "สอง",
-        "สาม",
-        "สี่",
-        "ห้า",
-        "หก",
-        "เจ็ด",
-        "แปด",
-        "เก้า",
-    ];
-    const txtDigitArr = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน"];
-    let output = "";
-    const len = numberString.length;
-    for (let i = 0; i < len; i++) {
-        const digit = parseInt(numberString[i] ?? "0");
-        const pos = len - 1 - i;
-        if (digit > 0) {
-            if (pos === 1 && digit === 1) output += "";
-            else if (pos === 1 && digit === 2) output += "ยี่";
-            else if (pos === 0 && digit === 1 && len > 1) output += "เอ็ด";
-            else output += txtNumArr[digit];
-            output += txtDigitArr[pos];
-        }
+  const txtNumArr = ['', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+  const txtDigitArr = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+  let output = '';
+  const len = numberString.length;
+  for (let i = 0; i < len; i++) {
+    const digit = parseInt(numberString[i] ?? '0');
+    const pos = len - 1 - i;
+    if (digit > 0) {
+      if (pos === 1 && digit === 1) output += '';
+      else if (pos === 1 && digit === 2) output += 'ยี่';
+      else if (pos === 0 && digit === 1 && len > 1) output += 'เอ็ด';
+      else output += txtNumArr[digit];
+      output += txtDigitArr[pos];
     }
-    return output || "ศูนย์";
+  }
+  return output || 'ศูนย์';
 }
 </script>
 

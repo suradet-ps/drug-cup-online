@@ -97,16 +97,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { supabase } from "@/supabaseClient";
-import type { RequisitionStatus } from "@/types/models";
+import { computed, onMounted, ref } from 'vue';
+import { supabase } from '@/supabaseClient';
+import type { RequisitionStatus } from '@/types/models';
 
 type DashboardRequisition = {
-    id: number;
-    submitted_at: string | null;
-    status: RequisitionStatus;
-    pcus_drugcupsabot: { name: string };
-    requisition_periods_drugcupsabot: { name: string };
+  id: number;
+  submitted_at: string | null;
+  status: RequisitionStatus;
+  pcus_drugcupsabot: { name: string };
+  requisition_periods_drugcupsabot: { name: string };
 };
 
 const loading = ref<boolean>(true);
@@ -114,43 +114,43 @@ const error = ref<string | null>(null);
 const requisitions = ref<DashboardRequisition[]>([]);
 
 const submittedRequisitions = computed<DashboardRequisition[]>(() => {
-    return requisitions.value.filter((req) => req.status === "submitted");
+  return requisitions.value.filter((req) => req.status === 'submitted');
 });
 
 const approvedRequisitions = computed<DashboardRequisition[]>(() => {
-    return requisitions.value.filter((req) => req.status === "approved");
+  return requisitions.value.filter((req) => req.status === 'approved');
 });
 
 onMounted(async () => {
-    try {
-        const { data, error: fetchError } = await supabase
-            .from("requisitions_drugcupsabot")
-            .select(
-                `
+  try {
+    const { data, error: fetchError } = await supabase
+      .from('requisitions_drugcupsabot')
+      .select(
+        `
         id,
         submitted_at,
         status,
         pcus_drugcupsabot ( name ),
         requisition_periods_drugcupsabot ( name )
       `,
-            )
-            .in("status", ["submitted", "approved"])
-            .order("submitted_at", { ascending: true });
+      )
+      .in('status', ['submitted', 'approved'])
+      .order('submitted_at', { ascending: true });
 
-        if (fetchError) throw fetchError;
-        // FIX: Supabase types FK joins as arrays even for many-to-one
-        requisitions.value = (data ?? []) as unknown as DashboardRequisition[];
-    } catch (err) {
-        error.value = "เกิดข้อผิดพลาดในการโหลดข้อมูลใบเบิก";
-        console.error(err);
-    } finally {
-        loading.value = false;
-    }
+    if (fetchError) throw fetchError;
+    // FIX: Supabase types FK joins as arrays even for many-to-one
+    requisitions.value = (data ?? []) as unknown as DashboardRequisition[];
+  } catch (err) {
+    error.value = 'เกิดข้อผิดพลาดในการโหลดข้อมูลใบเบิก';
+    console.error(err);
+  } finally {
+    loading.value = false;
+  }
 });
 
 function formatDate(dateString: string | null): string {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleString("th-TH");
+  if (!dateString) return 'N/A';
+  return new Date(dateString).toLocaleString('th-TH');
 }
 </script>
 

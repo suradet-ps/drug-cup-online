@@ -197,188 +197,169 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { supabase } from "@/supabaseClient";
-import type { Item } from "@/types/models";
+import { computed, onMounted, ref } from 'vue';
+import { supabase } from '@/supabaseClient';
+import type { Item } from '@/types/models';
 
 type NewItem = {
-    name: string;
-    price_per_unit: number;
-    unit_pack: string;
-    category: string;
-    is_active: boolean;
-    is_available: boolean;
-    notes: string | null;
+  name: string;
+  price_per_unit: number;
+  unit_pack: string;
+  category: string;
+  is_active: boolean;
+  is_available: boolean;
+  notes: string | null;
 };
 
 type NewItemWithOrders = NewItem & {
-    category_order: number;
-    item_order: number;
+  category_order: number;
+  item_order: number;
 };
 
 const loading = ref<boolean>(true);
 const isSubmitting = ref<boolean>(false);
 const error = ref<string | null>(null);
 const items = ref<Item[]>([]);
-const searchTerm = ref<string>("");
+const searchTerm = ref<string>('');
 const showAddItemModal = ref<boolean>(false);
-const newCategoryName = ref<string>("");
+const newCategoryName = ref<string>('');
 
 const newItem = ref<NewItem>({
-    name: "",
-    price_per_unit: 0,
-    unit_pack: "",
-    category: "",
-    is_active: true,
-    is_available: true,
-    notes: null,
+  name: '',
+  price_per_unit: 0,
+  unit_pack: '',
+  category: '',
+  is_active: true,
+  is_available: true,
+  notes: null,
 });
 
 const uniqueCategories = computed<string[]>(() => {
-    if (!items.value) return [];
-    const categories = items.value.map((item) => item.category);
-    return [...new Set(categories)].sort();
+  if (!items.value) return [];
+  const categories = items.value.map((item) => item.category);
+  return [...new Set(categories)].sort();
 });
 
 onMounted(async () => {
-    await fetchItems();
+  await fetchItems();
 });
 
 async function fetchItems(): Promise<void> {
-    try {
-        loading.value = true;
-        const { data, error: fetchError } = await supabase
-            .from("items_drugcupsabot")
-            .select("*")
-            .order("category_order", { ascending: true, nullsFirst: false })
-            .order("item_order", { ascending: true, nullsFirst: false })
-            .order("name", { ascending: true });
+  try {
+    loading.value = true;
+    const { data, error: fetchError } = await supabase
+      .from('items_drugcupsabot')
+      .select('*')
+      .order('category_order', { ascending: true, nullsFirst: false })
+      .order('item_order', { ascending: true, nullsFirst: false })
+      .order('name', { ascending: true });
 
-        if (fetchError) throw fetchError;
-        items.value = (data ?? []) as unknown as Item[];
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        error.value =
-            "ไม่สามารถโหลดข้อมูลรายการยาได้: " +
-            (err instanceof Error ? err.message : String(err));
-        console.error(err);
-    } finally {
-        loading.value = false;
-    }
+    if (fetchError) throw fetchError;
+    items.value = (data ?? []) as unknown as Item[];
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    error.value =
+      'ไม่สามารถโหลดข้อมูลรายการยาได้: ' + (err instanceof Error ? err.message : String(err));
+    console.error(err);
+  } finally {
+    loading.value = false;
+  }
 }
 
 const filteredItems = computed<Item[]>(() => {
-    if (!searchTerm.value) return items.value;
-    return items.value.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.value.toLowerCase()),
-    );
+  if (!searchTerm.value) return items.value;
+  return items.value.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.value.toLowerCase()),
+  );
 });
 
 async function updateItem(item: Item): Promise<void> {
-    try {
-        const {
-            id,
-            created_at,
-            category,
-            category_order,
-            item_order,
-            ...updateData
-        } = item;
+  try {
+    const { id, created_at, category, category_order, item_order, ...updateData } = item;
 
-        const { error: updateError } = await supabase
-            .from("items_drugcupsabot")
-            .update(updateData)
-            .eq("id", id);
+    const { error: updateError } = await supabase
+      .from('items_drugcupsabot')
+      .update(updateData)
+      .eq('id', id);
 
-        if (updateError) throw updateError;
-        alert(`อัปเดตรายการ "${item.name}" เรียบร้อยแล้ว`);
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        alert(
-            "เกิดข้อผิดพลาดในการอัปเดต: " +
-                (err instanceof Error ? err.message : String(err)),
-        );
-        console.error(err);
-    }
+    if (updateError) throw updateError;
+    alert(`อัปเดตรายการ "${item.name}" เรียบร้อยแล้ว`);
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    alert('เกิดข้อผิดพลาดในการอัปเดต: ' + (err instanceof Error ? err.message : String(err)));
+    console.error(err);
+  }
 }
 
 function openAddItemModal(): void {
-    newItem.value = {
-        name: "",
-        price_per_unit: 0,
-        unit_pack: "",
-        category: "",
-        is_active: true,
-        is_available: true,
-        notes: null,
-    };
-    newCategoryName.value = "";
-    showAddItemModal.value = true;
+  newItem.value = {
+    name: '',
+    price_per_unit: 0,
+    unit_pack: '',
+    category: '',
+    is_active: true,
+    is_available: true,
+    notes: null,
+  };
+  newCategoryName.value = '';
+  showAddItemModal.value = true;
 }
 
 async function handleAddItem(): Promise<void> {
-    isSubmitting.value = true;
-    try {
-        let finalCategory = newItem.value.category;
-        if (finalCategory === "--new--") {
-            if (!newCategoryName.value.trim()) {
-                alert("กรุณากรอกชื่อหมวดหมู่ใหม่");
-                return;
-            }
-            finalCategory = newCategoryName.value.trim();
-        }
-
-        const dataToInsert: NewItemWithOrders = {
-            ...newItem.value,
-            category: finalCategory,
-            category_order: 0,
-            item_order: 0,
-        };
-        if (dataToInsert.notes === "") dataToInsert.notes = null;
-
-        const existingCategory = items.value.find(
-            (item) => item.category === finalCategory,
-        );
-
-        if (existingCategory) {
-            dataToInsert.category_order = existingCategory.category_order ?? 0;
-            const maxItemOrder = items.value
-                .filter((item) => item.category === finalCategory)
-                .reduce(
-                    (max, item) => Math.max(max, item.item_order ?? 0),
-                    0,
-                );
-            dataToInsert.item_order = maxItemOrder + 1;
-        } else {
-            const maxCategoryOrder = items.value.reduce(
-                (max, item) => Math.max(max, item.category_order ?? 0),
-                0,
-            );
-            dataToInsert.category_order = maxCategoryOrder + 1;
-            dataToInsert.item_order = 1;
-        }
-
-        const { data, error: insertError } = await supabase
-            .from("items_drugcupsabot")
-            .insert(dataToInsert)
-            .select();
-
-        if (insertError) throw insertError;
-
-        const inserted = (data ?? []) as unknown as Item[];
-        alert(`เพิ่มรายการ "${inserted[0]?.name}" สำเร็จ`);
-        showAddItemModal.value = false;
-        await fetchItems();
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        alert(
-            "เกิดข้อผิดพลาดในการเพิ่มรายการ: " +
-                (err instanceof Error ? err.message : String(err)),
-        );
-        console.error(err);
-    } finally {
-        isSubmitting.value = false;
+  isSubmitting.value = true;
+  try {
+    let finalCategory = newItem.value.category;
+    if (finalCategory === '--new--') {
+      if (!newCategoryName.value.trim()) {
+        alert('กรุณากรอกชื่อหมวดหมู่ใหม่');
+        return;
+      }
+      finalCategory = newCategoryName.value.trim();
     }
+
+    const dataToInsert: NewItemWithOrders = {
+      ...newItem.value,
+      category: finalCategory,
+      category_order: 0,
+      item_order: 0,
+    };
+    if (dataToInsert.notes === '') dataToInsert.notes = null;
+
+    const existingCategory = items.value.find((item) => item.category === finalCategory);
+
+    if (existingCategory) {
+      dataToInsert.category_order = existingCategory.category_order ?? 0;
+      const maxItemOrder = items.value
+        .filter((item) => item.category === finalCategory)
+        .reduce((max, item) => Math.max(max, item.item_order ?? 0), 0);
+      dataToInsert.item_order = maxItemOrder + 1;
+    } else {
+      const maxCategoryOrder = items.value.reduce(
+        (max, item) => Math.max(max, item.category_order ?? 0),
+        0,
+      );
+      dataToInsert.category_order = maxCategoryOrder + 1;
+      dataToInsert.item_order = 1;
+    }
+
+    const { data, error: insertError } = await supabase
+      .from('items_drugcupsabot')
+      .insert(dataToInsert)
+      .select();
+
+    if (insertError) throw insertError;
+
+    const inserted = (data ?? []) as unknown as Item[];
+    alert(`เพิ่มรายการ "${inserted[0]?.name}" สำเร็จ`);
+    showAddItemModal.value = false;
+    await fetchItems();
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    alert('เกิดข้อผิดพลาดในการเพิ่มรายการ: ' + (err instanceof Error ? err.message : String(err)));
+    console.error(err);
+  } finally {
+    isSubmitting.value = false;
+  }
 }
 </script>
 

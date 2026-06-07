@@ -62,18 +62,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { supabase } from "@/supabaseClient";
-import type { Pcu, PcuPersonnel } from "@/types/models";
+import { onMounted, ref } from 'vue';
+import { supabase } from '@/supabaseClient';
+import type { Pcu, PcuPersonnel } from '@/types/models';
 
 type PcuSetting = {
-    pcu_id: number;
-    pcu_name: string;
-    id: number | null;
-    requester_name: string;
-    requester_position: string;
-    receiver_name: string;
-    receiver_position: string;
+  pcu_id: number;
+  pcu_name: string;
+  id: number | null;
+  requester_name: string;
+  requester_position: string;
+  receiver_name: string;
+  receiver_position: string;
 };
 
 const loading = ref<boolean>(true);
@@ -81,80 +81,73 @@ const error = ref<string | null>(null);
 const pcuSettings = ref<PcuSetting[]>([]);
 
 onMounted(async () => {
-    await fetchSettings();
+  await fetchSettings();
 });
 
 async function fetchSettings(): Promise<void> {
-    loading.value = true;
-    error.value = null;
-    try {
-        const { data: pcus, error: pcuError } = await supabase
-            .from("pcus_drugcupsabot")
-            .select("id, name")
-            .order("name");
-        if (pcuError) throw pcuError;
+  loading.value = true;
+  error.value = null;
+  try {
+    const { data: pcus, error: pcuError } = await supabase
+      .from('pcus_drugcupsabot')
+      .select('id, name')
+      .order('name');
+    if (pcuError) throw pcuError;
 
-        const { data: personnel, error: personnelError } = await supabase
-            .from("pcu_personnel_drugcupsabot")
-            .select("*");
-        if (personnelError) throw personnelError;
+    const { data: personnel, error: personnelError } = await supabase
+      .from('pcu_personnel_drugcupsabot')
+      .select('*');
+    if (personnelError) throw personnelError;
 
-        const pcusList = (pcus ?? []) as unknown as Pcu[];
-        const personnelList = (personnel ?? []) as unknown as PcuPersonnel[];
+    const pcusList = (pcus ?? []) as unknown as Pcu[];
+    const personnelList = (personnel ?? []) as unknown as PcuPersonnel[];
 
-        const settings = pcusList.map((pcu) => {
-            const existingPersonnel = personnelList.find(
-                (p) => p.pcu_id === pcu.id,
-            );
-            return {
-                pcu_id: pcu.id,
-                pcu_name: pcu.name,
-                id: existingPersonnel?.id ?? null,
-                requester_name: existingPersonnel?.requester_name || "",
-                requester_position:
-                    existingPersonnel?.requester_position || "",
-                receiver_name: existingPersonnel?.receiver_name || "",
-                receiver_position: existingPersonnel?.receiver_position || "",
-            };
-        });
-        pcuSettings.value = settings;
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        error.value =
-            "ไม่สามารถโหลดข้อมูลการตั้งค่าได้: " +
-            (err instanceof Error ? err.message : String(err));
-        console.error(err);
-    } finally {
-        loading.value = false;
-    }
+    const settings = pcusList.map((pcu) => {
+      const existingPersonnel = personnelList.find((p) => p.pcu_id === pcu.id);
+      return {
+        pcu_id: pcu.id,
+        pcu_name: pcu.name,
+        id: existingPersonnel?.id ?? null,
+        requester_name: existingPersonnel?.requester_name || '',
+        requester_position: existingPersonnel?.requester_position || '',
+        receiver_name: existingPersonnel?.receiver_name || '',
+        receiver_position: existingPersonnel?.receiver_position || '',
+      };
+    });
+    pcuSettings.value = settings;
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    error.value =
+      'ไม่สามารถโหลดข้อมูลการตั้งค่าได้: ' + (err instanceof Error ? err.message : String(err));
+    console.error(err);
+  } finally {
+    loading.value = false;
+  }
 }
 
 async function savePcuPersonnel(pcu: PcuSetting): Promise<void> {
-    try {
-        const upsertData = {
-            pcu_id: pcu.pcu_id,
-            requester_name: pcu.requester_name,
-            requester_position: pcu.requester_position,
-            receiver_name: pcu.receiver_name,
-            receiver_position: pcu.receiver_position,
-        };
+  try {
+    const upsertData = {
+      pcu_id: pcu.pcu_id,
+      requester_name: pcu.requester_name,
+      requester_position: pcu.requester_position,
+      receiver_name: pcu.receiver_name,
+      receiver_position: pcu.receiver_position,
+    };
 
-        const { error: upsertError } = await supabase
-            .from("pcu_personnel_drugcupsabot")
-            .upsert(upsertData, { onConflict: "pcu_id" });
+    const { error: upsertError } = await supabase
+      .from('pcu_personnel_drugcupsabot')
+      .upsert(upsertData, { onConflict: 'pcu_id' });
 
-        if (upsertError) throw upsertError;
+    if (upsertError) throw upsertError;
 
-        alert(`บันทึกข้อมูลของ ${pcu.pcu_name} เรียบร้อยแล้ว`);
-        await fetchSettings();
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        alert(
-            "เกิดข้อผิดพลาดในการบันทึก: " +
-                (err instanceof Error ? err.message : String(err)),
-        );
-        console.error(err);
-    }
+    alert(`บันทึกข้อมูลของ ${pcu.pcu_name} เรียบร้อยแล้ว`);
+    await fetchSettings();
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    alert('เกิดข้อผิดพลาดในการบันทึก: ' + (err instanceof Error ? err.message : String(err)));
+    console.error(err);
+  }
 }
 </script>
 

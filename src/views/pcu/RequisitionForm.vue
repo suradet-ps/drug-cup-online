@@ -127,24 +127,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { useRouter } from "vue-router";
-import { supabase } from "@/supabaseClient";
-import { useAuthStore } from "@/store/auth";
-import type {
-    Item,
-    RequisitionPeriod,
-    RequisitionStatus,
-} from "@/types/models";
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/store/auth';
+import { supabase } from '@/supabaseClient';
+import type { Item, RequisitionPeriod, RequisitionStatus } from '@/types/models';
 
 type RequisitionEntry = {
-    quantity: number | null;
-    onHand: number | null;
+  quantity: number | null;
+  onHand: number | null;
 };
 
 const props = defineProps<{
-    periodId: string;
-    requisitionId?: string;
+  periodId: string;
+  requisitionId?: string;
 }>();
 
 const router = useRouter();
@@ -154,210 +150,189 @@ const loading = ref<boolean>(true);
 const isSubmitting = ref<boolean>(false);
 const error = ref<string | null>(null);
 const items = ref<Item[]>([]);
-const periodInfo = ref<Pick<RequisitionPeriod, "name"> | null>(null);
+const periodInfo = ref<Pick<RequisitionPeriod, 'name'> | null>(null);
 const requisitionData = ref<Record<number, RequisitionEntry>>({});
 const totalValue = ref<number>(0);
-const searchTerm = ref<string>("");
+const searchTerm = ref<string>('');
 
 const isEditing = computed<boolean>(
-    () => props.requisitionId !== undefined && props.requisitionId !== "new",
+  () => props.requisitionId !== undefined && props.requisitionId !== 'new',
 );
 
 onMounted(async () => {
-    try {
-        const { data: periodData, error: periodError } = await supabase
-            .from("requisition_periods_drugcupsabot")
-            .select("name")
-            .eq("id", props.periodId)
-            .single();
-        if (periodError) throw periodError;
-        periodInfo.value = periodData;
+  try {
+    const { data: periodData, error: periodError } = await supabase
+      .from('requisition_periods_drugcupsabot')
+      .select('name')
+      .eq('id', props.periodId)
+      .single();
+    if (periodError) throw periodError;
+    periodInfo.value = periodData;
 
-        const { data: itemsData, error: itemsError } = await supabase
-            .from("items_drugcupsabot")
-            .select("*")
-            .eq("is_active", true)
-            .order("category_order", { ascending: true })
-            .order("item_order", { ascending: true });
-        if (itemsError) throw itemsError;
-        items.value = (itemsData ?? []) as unknown as Item[];
+    const { data: itemsData, error: itemsError } = await supabase
+      .from('items_drugcupsabot')
+      .select('*')
+      .eq('is_active', true)
+      .order('category_order', { ascending: true })
+      .order('item_order', { ascending: true });
+    if (itemsError) throw itemsError;
+    items.value = (itemsData ?? []) as unknown as Item[];
 
-        items.value.forEach((item) => {
-            requisitionData.value[item.id] = { quantity: null, onHand: null };
+    items.value.forEach((item) => {
+      requisitionData.value[item.id] = { quantity: null, onHand: null };
+    });
+
+    if (isEditing.value) {
+      const { data: existingData, error: draftError } = await supabase
+        .from('requisition_items_drugcupsabot')
+        .select('item_id, quantity, on_hand_quantity')
+        .eq('requisition_id', props.requisitionId);
+
+      if (draftError) throw draftError;
+
+      if (existingData) {
+        existingData.forEach((item) => {
+          if (requisitionData.value[item.item_id]) {
+            requisitionData.value[item.item_id].quantity = item.quantity;
+            requisitionData.value[item.item_id].onHand = item.on_hand_quantity;
+          }
         });
-
-        if (isEditing.value) {
-            const { data: existingData, error: draftError } = await supabase
-                .from("requisition_items_drugcupsabot")
-                .select("item_id, quantity, on_hand_quantity")
-                .eq("requisition_id", props.requisitionId);
-
-            if (draftError) throw draftError;
-
-            if (existingData) {
-                existingData.forEach((item) => {
-                    if (requisitionData.value[item.item_id]) {
-                        requisitionData.value[item.item_id].quantity =
-                            item.quantity;
-                        requisitionData.value[item.item_id].onHand =
-                            item.on_hand_quantity;
-                    }
-                });
-                updateTotal();
-            }
-        }
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        error.value =
-            "ไม่สามารถโหลดข้อมูลได้: " +
-            (err instanceof Error ? err.message : String(err));
-        console.error(err);
-    } finally {
-        loading.value = false;
+        updateTotal();
+      }
     }
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    error.value = 'ไม่สามารถโหลดข้อมูลได้: ' + (err instanceof Error ? err.message : String(err));
+    console.error(err);
+  } finally {
+    loading.value = false;
+  }
 });
 
 const filteredItems = computed<Item[]>(() => {
-    if (!searchTerm.value) return items.value;
-    return items.value.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.value.toLowerCase()),
-    );
+  if (!searchTerm.value) return items.value;
+  return items.value.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.value.toLowerCase()),
+  );
 });
 
 function calculateValue(item: Item): number {
-    if (!item.is_available) {
-        if (requisitionData.value[item.id]?.quantity) {
-            requisitionData.value[item.id].quantity = 0;
-        }
-        return 0;
+  if (!item.is_available) {
+    if (requisitionData.value[item.id]?.quantity) {
+      requisitionData.value[item.id].quantity = 0;
     }
-    const quantity = requisitionData.value[item.id]?.quantity || 0;
-    return quantity * item.price_per_unit;
+    return 0;
+  }
+  const quantity = requisitionData.value[item.id]?.quantity || 0;
+  return quantity * item.price_per_unit;
 }
 
 function updateTotal(): void {
-    totalValue.value = items.value.reduce((sum, item) => {
-        return sum + calculateValue(item);
-    }, 0);
+  totalValue.value = items.value.reduce((sum, item) => {
+    return sum + calculateValue(item);
+  }, 0);
 }
 
 function formatCurrency(value: number | null): string {
-    if (value === null || isNaN(value)) return "0.00";
-    return Number(value).toLocaleString("th-TH", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+  if (value === null || isNaN(value)) return '0.00';
+  return Number(value).toLocaleString('th-TH', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 async function saveRequisition(status: RequisitionStatus): Promise<void> {
-    if (!auth.userProfile || !auth.userPcuId) {
-        alert("ข้อมูลผู้ใช้ไม่สมบูรณ์");
-        return;
+  if (!auth.userProfile || !auth.userPcuId) {
+    alert('ข้อมูลผู้ใช้ไม่สมบูรณ์');
+    return;
+  }
+  isSubmitting.value = true;
+
+  try {
+    let currentRequisitionId: number | null = isEditing.value
+      ? // FIX: route params are always strings, but DB column is number;
+        // strict TS requires explicit conversion (preserved coercion behavior)
+        Number(props.requisitionId)
+      : null;
+
+    if (!isEditing.value) {
+      const { data: newHeader, error: headerError } = await supabase
+        .from('requisitions_drugcupsabot')
+        .insert({
+          pcu_id: auth.userPcuId,
+          period_id: props.periodId,
+          requester_id: auth.userProfile.id,
+          status: 'draft',
+        })
+        .select('id')
+        .single();
+
+      if (headerError) throw headerError;
+      currentRequisitionId = newHeader.id;
     }
-    isSubmitting.value = true;
 
-    try {
-        let currentRequisitionId: number | null = isEditing.value
-            ? // FIX: route params are always strings, but DB column is number;
-              // strict TS requires explicit conversion (preserved coercion behavior)
-              Number(props.requisitionId)
-            : null;
+    const { error: deleteError } = await supabase
+      .from('requisition_items_drugcupsabot')
+      .delete()
+      .eq('requisition_id', currentRequisitionId);
+    if (deleteError) throw deleteError;
 
-        if (!isEditing.value) {
-            const { data: newHeader, error: headerError } = await supabase
-                .from("requisitions_drugcupsabot")
-                .insert({
-                    pcu_id: auth.userPcuId,
-                    period_id: props.periodId,
-                    requester_id: auth.userProfile.id,
-                    status: "draft",
-                })
-                .select("id")
-                .single();
-
-            if (headerError) throw headerError;
-            currentRequisitionId = newHeader.id;
-        }
-
-        const { error: deleteError } = await supabase
-            .from("requisition_items_drugcupsabot")
-            .delete()
-            .eq("requisition_id", currentRequisitionId);
-        if (deleteError) throw deleteError;
-
-        const itemsToInsert = Object.entries(requisitionData.value)
-            .filter(([itemId, entry]) => {
-                // FIX: original used `i.id == itemId` (loose equality);
-                // strict TS requires Number() conversion to compare number vs string
-                const itemDetails = items.value.find(
-                    (i) => i.id === Number(itemId),
-                );
-                return (
-                    entry.quantity > 0 &&
-                    entry.quantity !== null &&
-                    itemDetails &&
-                    itemDetails.is_available
-                );
-            })
-            .map(([itemId, entry]) => {
-                // FIX: same as above
-                const itemDetails = items.value.find(
-                    (i) => i.id === Number(itemId),
-                );
-                return {
-                    requisition_id: currentRequisitionId,
-                    item_id: Number(itemId),
-                    quantity: entry.quantity,
-                    on_hand_quantity: entry.onHand,
-                    price_at_request: itemDetails!.price_per_unit,
-                };
-            });
-
-        if (itemsToInsert.length > 0) {
-            const { error: insertError } = await supabase
-                .from("requisition_items_drugcupsabot")
-                .insert(itemsToInsert);
-            if (insertError) throw insertError;
-        }
-
-        const { error: updateStatusError } = await supabase
-            .from("requisitions_drugcupsabot")
-            .update({
-                status: status,
-                submitted_at:
-                    status === "submitted" ? new Date().toISOString() : null,
-            })
-            .eq("id", currentRequisitionId);
-        if (updateStatusError) throw updateStatusError;
-
-        alert(
-            `ใบเบิกถูก "${status === "submitted" ? "ส่ง" : "บันทึก"}" เรียบร้อยแล้ว`,
+    const itemsToInsert = Object.entries(requisitionData.value)
+      .filter(([itemId, entry]) => {
+        // FIX: original used `i.id == itemId` (loose equality);
+        // strict TS requires Number() conversion to compare number vs string
+        const itemDetails = items.value.find((i) => i.id === Number(itemId));
+        return (
+          entry.quantity > 0 && entry.quantity !== null && itemDetails && itemDetails.is_available
         );
-        router.push("/pcu/dashboard");
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        alert(
-            "เกิดข้อผิดพลาดในการบันทึก: " +
-                (err instanceof Error ? err.message : String(err)),
-        );
-        console.error(err);
-    } finally {
-        isSubmitting.value = false;
+      })
+      .map(([itemId, entry]) => {
+        // FIX: same as above
+        const itemDetails = items.value.find((i) => i.id === Number(itemId));
+        return {
+          requisition_id: currentRequisitionId,
+          item_id: Number(itemId),
+          quantity: entry.quantity,
+          on_hand_quantity: entry.onHand,
+          price_at_request: itemDetails!.price_per_unit,
+        };
+      });
+
+    if (itemsToInsert.length > 0) {
+      const { error: insertError } = await supabase
+        .from('requisition_items_drugcupsabot')
+        .insert(itemsToInsert);
+      if (insertError) throw insertError;
     }
+
+    const { error: updateStatusError } = await supabase
+      .from('requisitions_drugcupsabot')
+      .update({
+        status: status,
+        submitted_at: status === 'submitted' ? new Date().toISOString() : null,
+      })
+      .eq('id', currentRequisitionId);
+    if (updateStatusError) throw updateStatusError;
+
+    alert(`ใบเบิกถูก "${status === 'submitted' ? 'ส่ง' : 'บันทึก'}" เรียบร้อยแล้ว`);
+    router.push('/pcu/dashboard');
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    alert('เกิดข้อผิดพลาดในการบันทึก: ' + (err instanceof Error ? err.message : String(err)));
+    console.error(err);
+  } finally {
+    isSubmitting.value = false;
+  }
 }
 
 function saveDraft(): void {
-    saveRequisition("draft");
+  saveRequisition('draft');
 }
 
 function submitForm(): void {
-    if (
-        confirm(
-            "คุณต้องการยืนยันการส่งใบเบิกนี้ใช่หรือไม่? เมื่อส่งแล้วจะไม่สามารถแก้ไขได้อีก",
-        )
-    ) {
-        saveRequisition("submitted");
-    }
+  if (confirm('คุณต้องการยืนยันการส่งใบเบิกนี้ใช่หรือไม่? เมื่อส่งแล้วจะไม่สามารถแก้ไขได้อีก')) {
+    saveRequisition('submitted');
+  }
 }
 </script>
 

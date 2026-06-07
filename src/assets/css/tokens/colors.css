@@ -3,37 +3,37 @@
    ------------------------------------------------------------------ */
 :root {
   /* Brand & Accent */
-  --color-black:        #000000;
-  --color-near-black:   #17171c;
-  --color-deep-green:   #003c33;
-  --color-dark-navy:    #071829;
-  --color-action-blue:  #1863dc;
-  --color-coral:        #ff7759;
-  --color-soft-coral:   #ffad9b;
+  --color-black: #000000;
+  --color-near-black: #17171c;
+  --color-deep-green: #003c33;
+  --color-dark-navy: #071829;
+  --color-action-blue: #1863dc;
+  --color-coral: #ff7759;
+  --color-soft-coral: #ffad9b;
 
   /* Surface & Background */
-  --color-canvas:       #ffffff;
-  --color-soft-stone:   #eeece7;
-  --color-pale-green:   #edfce9;
-  --color-pale-blue:    #f1f5ff;
-  --color-card-border:  #f2f2f2;
+  --color-canvas: #ffffff;
+  --color-soft-stone: #eeece7;
+  --color-pale-green: #edfce9;
+  --color-pale-blue: #f1f5ff;
+  --color-card-border: #f2f2f2;
 
   /* Text & Rules */
-  --color-ink:          #212121;
-  --color-muted-slate:  #93939f;
-  --color-slate:        #75758a;
-  --color-hairline:     #d9d9dd;
+  --color-ink: #212121;
+  --color-muted-slate: #93939f;
+  --color-slate: #75758a;
+  --color-hairline: #d9d9dd;
   --color-border-light: #e5e7eb;
 
   /* Semantic */
-  --color-focus-blue:   #4c6ee6;
-  --color-form-focus:   #9b60aa;
-  --color-error:        #b30000;
+  --color-focus-blue: #4c6ee6;
+  --color-form-focus: #9b60aa;
+  --color-error: #b30000;
 
   /* Status (adapted from DESIGN.md taxonomy chips) */
-  --color-status-draft:     var(--color-muted-slate);
+  --color-status-draft: var(--color-muted-slate);
   --color-status-submitted: #b45309;
-  --color-status-approved:  var(--color-action-blue);
+  --color-status-approved: var(--color-action-blue);
   --color-status-fulfilled: #166534;
-  --color-status-rejected:  var(--color-error);
+  --color-status-rejected: var(--color-error);
 }

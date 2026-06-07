@@ -3,74 +3,76 @@
    Imports all token files. DESIGN.md is the single source of truth.
    =================================================================== */
 
-@import './css/tokens/colors.css';
-@import './css/tokens/typography.css';
-@import './css/tokens/spacing.css';
-@import './css/tokens/radius.css';
-@import './css/tokens/shadows.css';
-@import './css/tokens/motion.css';
+@import "./css/tokens/colors.css";
+@import "./css/tokens/typography.css";
+@import "./css/tokens/spacing.css";
+@import "./css/tokens/radius.css";
+@import "./css/tokens/shadows.css";
+@import "./css/tokens/motion.css";
 
 /* -------------------------------------------------------------------
    Semantic aliases — map design tokens to component roles
    ------------------------------------------------------------------- */
 :root {
   /* Primary action color: near-black (Cohere CTA style) */
-  --color-primary:        var(--color-near-black);
-  --color-primary-hover:  #2c2c34;
+  --color-primary: var(--color-near-black);
+  --color-primary-hover: #2c2c34;
 
   /* Danger */
-  --color-danger:         var(--color-error);
-  --color-danger-hover:   #8b0000;
+  --color-danger: var(--color-error);
+  --color-danger-hover: #8b0000;
 
   /* Warning */
-  --color-warning:        var(--color-status-submitted);
-  --color-warning-hover:  #92400e;
+  --color-warning: var(--color-status-submitted);
+  --color-warning-hover: #92400e;
 
   /* Success */
-  --color-success:        var(--color-status-fulfilled);
-  --color-success-hover:  #14532d;
+  --color-success: var(--color-status-fulfilled);
+  --color-success-hover: #14532d;
 
   /* Info (links/secondary actions) */
-  --color-info:           var(--color-action-blue);
-  --color-info-hover:     #1251b0;
+  --color-info: var(--color-action-blue);
+  --color-info-hover: #1251b0;
 
   /* Text roles */
-  --text-color:           var(--color-ink);
-  --text-muted:           var(--color-muted-slate);
-  --text-on-dark:         var(--color-canvas);
+  --text-color: var(--color-ink);
+  --text-muted: var(--color-muted-slate);
+  --text-on-dark: var(--color-canvas);
 
   /* Surfaces */
-  --bg-color:             var(--color-canvas);
-  --surface-color:        var(--color-canvas);
-  --border-color:         var(--color-border-light);
+  --bg-color: var(--color-canvas);
+  --surface-color: var(--color-canvas);
+  --border-color: var(--color-border-light);
 
   /* Legacy aliases for scoped styles in existing views */
-  --primary-color:        var(--color-near-black);
-  --primary-hover:        #2c2c34;
-  --secondary-color:      var(--color-muted-slate);
-  --secondary-hover:      var(--color-slate);
-  --danger-color:         var(--color-error);
-  --danger-hover:         #8b0000;
-  --warning-color:        var(--color-status-submitted);
-  --warning-hover:        #92400e;
-  --success-color:        var(--color-status-fulfilled);
-  --success-hover:        #14532d;
-  --info-color:           var(--color-action-blue);
-  --info-hover:           #1251b0;
-  --text-on-primary:      var(--color-canvas);
-  --text-on-accent:       var(--color-canvas);
-  --box-shadow:           var(--shadow-card);
-  --box-shadow-lg:        var(--shadow-overlay);
-  --border-radius:        var(--radius-sm);
+  --primary-color: var(--color-near-black);
+  --primary-hover: #2c2c34;
+  --secondary-color: var(--color-muted-slate);
+  --secondary-hover: var(--color-slate);
+  --danger-color: var(--color-error);
+  --danger-hover: #8b0000;
+  --warning-color: var(--color-status-submitted);
+  --warning-hover: #92400e;
+  --success-color: var(--color-status-fulfilled);
+  --success-hover: #14532d;
+  --info-color: var(--color-action-blue);
+  --info-hover: #1251b0;
+  --text-on-primary: var(--color-canvas);
+  --text-on-accent: var(--color-canvas);
+  --box-shadow: var(--shadow-card);
+  --box-shadow-lg: var(--shadow-overlay);
+  --border-radius: var(--radius-sm);
 
   /* Font family */
-  --font-family:          var(--font-body);
+  --font-family: var(--font-body);
 }
 
 /* -------------------------------------------------------------------
    Global Resets
    ------------------------------------------------------------------- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -107,7 +109,12 @@ main {
    ------------------------------------------------------------------- */
 /* DESIGN.md: Section Heading / Card Heading / Feature Heading use Unica77
    (body/UI face). Only hero/display headings use the display face.     */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-body);
   color: var(--color-ink);
   font-weight: var(--weight-normal);
@@ -191,10 +198,18 @@ a:focus-visible {
 /* -------------------------------------------------------------------
    Text utilities
    ------------------------------------------------------------------- */
-.text-center   { text-align: center; }
-.text-right    { text-align: right; }
-.text-muted    { color: var(--color-muted-slate); }
-.bold          { font-weight: var(--weight-semibold); }
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+.text-muted {
+  color: var(--color-muted-slate);
+}
+.bold {
+  font-weight: var(--weight-semibold);
+}
 
 /* Mono label: uppercase technical labels (DESIGN.md §Mono Label) */
 .mono-label {
@@ -257,7 +272,7 @@ textarea {
   color: var(--color-ink);
   transition:
     border-color var(--duration-base) var(--easing-standard),
-    box-shadow    var(--duration-base) var(--easing-standard);
+    box-shadow var(--duration-base) var(--easing-standard);
   appearance: none;
 }
 
@@ -300,9 +315,9 @@ select:disabled {
   cursor: pointer;
   transition:
     background-color var(--duration-base) var(--easing-standard),
-    border-color     var(--duration-base) var(--easing-standard),
-    color            var(--duration-base) var(--easing-standard),
-    box-shadow       var(--duration-base) var(--easing-standard);
+    border-color var(--duration-base) var(--easing-standard),
+    color var(--duration-base) var(--easing-standard),
+    box-shadow var(--duration-base) var(--easing-standard);
   text-align: center;
   vertical-align: middle;
   user-select: none;
@@ -323,99 +338,99 @@ select:disabled {
 /* button-primary: near-black pill */
 .btn-primary {
   background-color: var(--color-near-black);
-  border-color:     var(--color-near-black);
-  color:            var(--color-canvas);
+  border-color: var(--color-near-black);
+  color: var(--color-canvas);
 }
 .btn-primary:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
-  border-color:     var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
   text-decoration: none;
-  color:            var(--color-canvas);
+  color: var(--color-canvas);
 }
 
 /* button-secondary: outline variant */
 .btn-secondary {
   background-color: transparent;
-  border-color:     var(--color-hairline);
-  color:            var(--color-ink);
+  border-color: var(--color-hairline);
+  color: var(--color-ink);
 }
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--color-soft-stone);
-  border-color:     var(--color-slate);
+  border-color: var(--color-slate);
   text-decoration: none;
-  color:            var(--color-ink);
+  color: var(--color-ink);
 }
 
 /* button-pill-outline: research filter style (DESIGN.md §button-pill-outline) */
 .btn-pill-outline {
   background-color: transparent;
-  border-color:     var(--color-near-black);
-  border-width:     1px;
-  border-radius:    var(--radius-xl);
-  color:            var(--color-near-black);
+  border-color: var(--color-near-black);
+  border-width: 1px;
+  border-radius: var(--radius-xl);
+  color: var(--color-near-black);
 }
 .btn-pill-outline:hover:not(:disabled) {
   background-color: var(--color-near-black);
-  color:            var(--color-canvas);
+  color: var(--color-canvas);
   text-decoration: none;
 }
 
 /* Danger */
 .btn-danger {
   background-color: var(--color-error);
-  border-color:     var(--color-error);
-  color:            var(--color-canvas);
+  border-color: var(--color-error);
+  color: var(--color-canvas);
 }
 .btn-danger:hover:not(:disabled) {
   background-color: var(--color-danger-hover);
-  border-color:     var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
   text-decoration: none;
-  color:            var(--color-canvas);
+  color: var(--color-canvas);
 }
 
 /* Warning */
 .btn-warning {
   background-color: var(--color-warning);
-  border-color:     var(--color-warning);
-  color:            var(--color-canvas);
+  border-color: var(--color-warning);
+  color: var(--color-canvas);
 }
 .btn-warning:hover:not(:disabled) {
   background-color: var(--color-warning-hover);
-  border-color:     var(--color-warning-hover);
+  border-color: var(--color-warning-hover);
   text-decoration: none;
-  color:            var(--color-canvas);
+  color: var(--color-canvas);
 }
 
 /* Success */
 .btn-success {
   background-color: var(--color-success);
-  border-color:     var(--color-success);
-  color:            var(--color-canvas);
+  border-color: var(--color-success);
+  color: var(--color-canvas);
 }
 .btn-success:hover:not(:disabled) {
   background-color: var(--color-success-hover);
-  border-color:     var(--color-success-hover);
+  border-color: var(--color-success-hover);
   text-decoration: none;
-  color:            var(--color-canvas);
+  color: var(--color-canvas);
 }
 
 /* Info */
 .btn-info {
   background-color: var(--color-action-blue);
-  border-color:     var(--color-action-blue);
-  color:            var(--color-canvas);
+  border-color: var(--color-action-blue);
+  color: var(--color-canvas);
 }
 .btn-info:hover:not(:disabled) {
   background-color: var(--color-info-hover);
-  border-color:     var(--color-info-hover);
+  border-color: var(--color-info-hover);
   text-decoration: none;
-  color:            var(--color-canvas);
+  color: var(--color-canvas);
 }
 
 /* Small size modifier */
 .btn-sm {
-  padding:    var(--space-1-5) var(--space-4);
-  font-size:  var(--text-micro);
+  padding: var(--space-1-5) var(--space-4);
+  font-size: var(--text-micro);
 }
 
 /* -------------------------------------------------------------------
@@ -433,7 +448,8 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--color-hairline);
   text-align: left;
@@ -445,13 +461,13 @@ td:last-child {
 }
 
 thead th {
-  font-family:     var(--font-mono);
-  font-size:       var(--text-micro);
-  font-weight:     var(--weight-normal);
-  letter-spacing:  var(--tracking-mono);
-  text-transform:  uppercase;
-  color:           var(--color-muted-slate);
-  border-bottom:   1px solid var(--color-hairline);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-normal);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  color: var(--color-muted-slate);
+  border-bottom: 1px solid var(--color-hairline);
   background-color: transparent;
   white-space: nowrap;
 }
@@ -488,38 +504,38 @@ tfoot td {
   align-items: center;
   padding: 2px var(--space-3);
   border-radius: var(--radius-full);
-  font-family:      var(--font-mono);
-  font-size:        var(--text-micro);
-  letter-spacing:   var(--tracking-mono);
-  text-transform:   uppercase;
-  font-weight:      var(--weight-normal);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  font-weight: var(--weight-normal);
   line-height: var(--leading-body);
   white-space: nowrap;
 }
 
 .status-badge.draft {
   background-color: var(--color-soft-stone);
-  color:            var(--color-muted-slate);
+  color: var(--color-muted-slate);
   border: 1px solid var(--color-hairline);
 }
 .status-badge.submitted {
   background-color: #fef3c7;
-  color:            #92400e;
+  color: #92400e;
   border: 1px solid #fcd34d;
 }
 .status-badge.approved {
   background-color: var(--color-pale-blue);
-  color:            var(--color-action-blue);
+  color: var(--color-action-blue);
   border: 1px solid rgba(24, 99, 220, 0.25);
 }
 .status-badge.fulfilled {
   background-color: var(--color-pale-green);
-  color:            var(--color-status-fulfilled);
+  color: var(--color-status-fulfilled);
   border: 1px solid rgba(22, 101, 52, 0.25);
 }
 .status-badge.rejected {
   background-color: #fff5f5;
-  color:            var(--color-error);
+  color: var(--color-error);
   border: 1px solid rgba(179, 0, 0, 0.25);
 }
 

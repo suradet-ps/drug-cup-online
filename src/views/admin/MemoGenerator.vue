@@ -83,13 +83,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { useRouter } from "vue-router";
-import { supabase } from "@/supabaseClient";
-import type {
-    AccountingSummaryRow,
-    RequisitionPeriod,
-} from "@/types/models";
+import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { supabase } from '@/supabaseClient';
+import type { AccountingSummaryRow, RequisitionPeriod } from '@/types/models';
 
 const router = useRouter();
 const loading = ref<boolean>(false);
@@ -99,55 +96,50 @@ const selectedPeriod = ref<number | null>(null);
 const reportData = ref<AccountingSummaryRow[]>([]);
 
 const grandTotal = computed<number>(() =>
-    reportData.value.reduce((sum, pcu) => sum + pcu.total_value, 0),
+  reportData.value.reduce((sum, pcu) => sum + pcu.total_value, 0),
 );
 
 onMounted(async () => {
-    const { data } = await supabase
-        .from("requisition_periods_drugcupsabot")
-        .select("id, name")
-        .order("start_date", { ascending: false });
-    periods.value = (data ?? []) as unknown as RequisitionPeriod[];
+  const { data } = await supabase
+    .from('requisition_periods_drugcupsabot')
+    .select('id, name')
+    .order('start_date', { ascending: false });
+  periods.value = (data ?? []) as unknown as RequisitionPeriod[];
 });
 
 async function fetchReportData(): Promise<void> {
-    if (!selectedPeriod.value) return;
-    loading.value = true;
-    error.value = null;
-    reportData.value = [];
-    try {
-        const { data, error: fetchError } = await supabase.rpc(
-            "get_accounting_summary_by_period",
-            {
-                period_id_param: selectedPeriod.value,
-            },
-        );
-        if (fetchError) throw fetchError;
-        reportData.value = (data ?? []) as unknown as AccountingSummaryRow[];
-    } catch (err) {
-        // FIX: error is unknown in strict TS, narrow to Error before reading .message
-        error.value =
-            "เกิดข้อผิดพลาด: " +
-            (err instanceof Error ? err.message : String(err));
-    } finally {
-        loading.value = false;
-    }
+  if (!selectedPeriod.value) return;
+  loading.value = true;
+  error.value = null;
+  reportData.value = [];
+  try {
+    const { data, error: fetchError } = await supabase.rpc('get_accounting_summary_by_period', {
+      period_id_param: selectedPeriod.value,
+    });
+    if (fetchError) throw fetchError;
+    reportData.value = (data ?? []) as unknown as AccountingSummaryRow[];
+  } catch (err) {
+    // FIX: error is unknown in strict TS, narrow to Error before reading .message
+    error.value = 'เกิดข้อผิดพลาด: ' + (err instanceof Error ? err.message : String(err));
+  } finally {
+    loading.value = false;
+  }
 }
 
 function printMemo(): void {
-    if (!selectedPeriod.value) return;
-    const routeData = router.resolve({
-        name: "ApprovalMemoPrint",
-        query: { periodId: selectedPeriod.value },
-    });
-    window.open(routeData.href, "_blank");
+  if (!selectedPeriod.value) return;
+  const routeData = router.resolve({
+    name: 'ApprovalMemoPrint',
+    query: { periodId: selectedPeriod.value },
+  });
+  window.open(routeData.href, '_blank');
 }
 
 function formatCurrency(value: number): string {
-    return Number(value).toLocaleString("th-TH", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+  return Number(value).toLocaleString('th-TH', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 </script>
 
