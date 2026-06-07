@@ -19,6 +19,7 @@ import Home from '@/views/Home.vue';
 import Login from '@/views/Login.vue';
 // PCU Views
 import PcuDashboard from '@/views/pcu/PcuDashboard.vue';
+import PcuPrintableView from '@/views/pcu/PcuPrintableView.vue';
 import RequisitionDetail from '@/views/pcu/RequisitionDetail.vue';
 import RequisitionForm from '@/views/pcu/RequisitionForm.vue';
 import Register from '@/views/Register.vue';
@@ -71,6 +72,12 @@ const routes: RouteRecordRaw[] = [
     component: RequisitionDetail,
     meta: { requiresAuth: true, requiresPcu: true },
     props: true,
+  },
+  {
+    path: '/print/pcu-requisition',
+    name: 'PcuPrintRequisition',
+    component: PcuPrintableView,
+    meta: { requiresAuth: true, requiresPcu: true },
   },
 
   // Admin Specific Routes
