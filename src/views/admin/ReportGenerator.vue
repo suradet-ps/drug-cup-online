@@ -142,7 +142,6 @@
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "@/supabaseClient";
-import { utils, writeFile } from "xlsx";
 import type {
     RequisitionPeriod,
     RequisitionStatus,
@@ -255,8 +254,13 @@ function printDocument(): void {
     }, 1000);
 }
 
-function exportToExcel(): void {
+async function exportToExcel(): Promise<void> {
     if (!selectedRequisition.value) return;
+
+    // Dynamic import: xlsx (SheetJS) is ~400 kB and only needed when the
+    // user clicks "ส่งออกเป็น Excel". Loading it on demand keeps the
+    // initial bundle under the Vite chunk-size warning limit.
+    const { utils, writeFile } = await import("xlsx");
 
     const pcuName = selectedRequisition.value.pcus_drugcupsabot.name;
     const periodName =
