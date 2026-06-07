@@ -79,18 +79,22 @@
     <div v-else class="loading">กำลังเตรียมเอกสาร...</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { supabase } from "@/supabaseClient";
+import type {
+    AccountingSummaryRow,
+    RequisitionPeriod,
+} from "@/types/models";
 
 const route = useRoute();
-const loading = ref(true);
-const periodInfo = ref(null);
-const reportData = ref([]);
-const periodId = route.query.periodId;
+const loading = ref<boolean>(true);
+const periodInfo = ref<Pick<RequisitionPeriod, "name"> | null>(null);
+const reportData = ref<AccountingSummaryRow[]>([]);
+const periodId = route.query.periodId as string | undefined;
 
-const grandTotal = computed(() =>
+const grandTotal = computed<number>(() =>
     reportData.value.reduce((sum, pcu) => sum + pcu.total_value, 0),
 );
 
@@ -116,44 +120,46 @@ onMounted(async () => {
         );
         if (error) throw error;
 
-        reportData.value = data.sort((a, b) =>
-            a.pcu_name.localeCompare(b.pcu_name, "th"),
+        const sorted = ((data ?? []) as unknown as AccountingSummaryRow[]).sort(
+            (a, b) => a.pcu_name.localeCompare(b.pcu_name, "th"),
         );
+        reportData.value = sorted;
 
         setTimeout(() => window.print(), 500);
     } catch (err) {
-        document.body.innerHTML = `เกิดข้อผิดพลาด: ${err.message}`;
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        document.body.innerHTML = `เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`;
     } finally {
         loading.value = false;
     }
 });
 
-function formatDate(date) {
+function formatDate(date: Date): string {
     return date.toLocaleDateString("th-TH", {
         day: "numeric",
         month: "long",
         year: "numeric",
     });
 }
-function formatCurrency(value) {
+function formatCurrency(value: number): string {
     return Number(value).toLocaleString("th-TH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     });
 }
-function bahtText(number) {
+function bahtText(number: number): string {
     const num = Number(number);
     if (isNaN(num)) return "";
     const parts = num.toFixed(2).split(".");
-    const integerPart = parts[0];
-    const decimalPart = parts[1];
+    const integerPart = parts[0] ?? "0";
+    const decimalPart = parts[1] ?? "00";
     if (integerPart === "0" && decimalPart === "00") return "ศูนย์บาทถ้วน";
     const bahtTextInteger = convert(integerPart) + "บาท";
     const bahtTextDecimal =
         decimalPart === "00" ? "ถ้วน" : convert(decimalPart) + "สตางค์";
     return bahtTextInteger + bahtTextDecimal;
 }
-function convert(numberString) {
+function convert(numberString: string): string {
     const txtNumArr = [
         "",
         "หนึ่ง",
@@ -170,7 +176,7 @@ function convert(numberString) {
     let output = "";
     const len = numberString.length;
     for (let i = 0; i < len; i++) {
-        const digit = parseInt(numberString[i]);
+        const digit = parseInt(numberString[i] ?? "0");
         const pos = len - 1 - i;
         if (digit > 0) {
             if (pos === 1 && digit === 1) output += "";

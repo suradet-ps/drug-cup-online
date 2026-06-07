@@ -94,29 +94,35 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { supabase } from "@/supabaseClient";
 import { useRouter } from "vue-router";
+import type { Pcu } from "@/types/models";
 
 const router = useRouter();
-const pcuList = ref([]);
-const isPcuLoading = ref(true);
-const loading = ref(false);
-const errorMessage = ref("");
+const pcuList = ref<Pcu[]>([]);
+const isPcuLoading = ref<boolean>(true);
+const loading = ref<boolean>(false);
+const errorMessage = ref<string>("");
 
-const form = ref({
+const form = ref<{
+    username: string;
+    email: string;
+    password: string;
+    pcu_id: string;
+}>({
     username: "",
     email: "",
     password: "",
     pcu_id: "",
 });
 
-const APP_BASE_URL =
+const APP_BASE_URL: string =
     import.meta.env.VITE_APP_BASE_URL || window.location.origin;
 const EMAIL_REDIRECT_URL = `${APP_BASE_URL}/waiting-for-approval`;
 
-async function fetchPcuList() {
+async function fetchPcuList(): Promise<void> {
     try {
         isPcuLoading.value = true;
         const { data, error } = await supabase
@@ -124,7 +130,7 @@ async function fetchPcuList() {
             .select("id, name")
             .order("name");
         if (error) throw error;
-        pcuList.value = data;
+        pcuList.value = (data ?? []) as unknown as Pcu[];
     } catch (err) {
         console.error("Error fetching PCU list:", err);
         errorMessage.value =
@@ -138,14 +144,18 @@ onMounted(() => {
     fetchPcuList();
 });
 
-async function handleRegister() {
+async function handleRegister(): Promise<void> {
     if (!form.value.pcu_id) {
         errorMessage.value = "กรุณาเลือก รพ.สต. ของคุณ";
         return;
     }
 
     const isValidPcu = pcuList.value.some(
-        (pcu) => pcu.id === form.value.pcu_id,
+        // FIX: HTML <select> v-model returns string, but pcus.id is number.
+        // Preserved original behavior: strict equality between number and string
+        // is always false, so this branch (and the alert path below) is dead
+        // code at runtime. Cast keeps TS happy without changing semantics.
+        (pcu) => pcu.id === (form.value.pcu_id as unknown as number),
     );
     if (!isValidPcu) {
         errorMessage.value = "ข้อมูล รพ.สต. ไม่ถูกต้อง โปรดเลือกใหม่อีกครั้ง";
@@ -178,13 +188,18 @@ async function handleRegister() {
     } catch (error) {
         console.error("Registration error:", error);
 
-        if (error.message.includes("User already registered")) {
-            errorMessage.value = "อีเมลนี้มีการลงทะเบียนแล้ว";
-        } else if (error.message.includes("PCU does not exist")) {
-            errorMessage.value =
-                "ข้อมูล รพ.สต. ไม่ถูกต้อง กรุณาเลือกใหม่อีกครั้ง";
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        if (error instanceof Error) {
+            if (error.message.includes("User already registered")) {
+                errorMessage.value = "อีเมลนี้มีการลงทะเบียนแล้ว";
+            } else if (error.message.includes("PCU does not exist")) {
+                errorMessage.value =
+                    "ข้อมูล รพ.สต. ไม่ถูกต้อง กรุณาเลือกใหม่อีกครั้ง";
+            } else {
+                errorMessage.value = "เกิดข้อผิดพลาด: " + error.message;
+            }
         } else {
-            errorMessage.value = "เกิดข้อผิดพลาด: " + error.message;
+            errorMessage.value = "เกิดข้อผิดพลาด: " + String(error);
         }
     } finally {
         loading.value = false;

@@ -93,19 +93,18 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { supabase } from "@/supabaseClient";
+import type { RequisitionWithJoins } from "@/types/models";
 
-const props = defineProps({
-    requisitionId: String,
-});
+const props = defineProps<{ requisitionId: string }>();
 
 const route = useRoute();
-const loading = ref(true);
-const error = ref(null);
-const requisition = ref(null);
+const loading = ref<boolean>(true);
+const error = ref<string | null>(null);
+const requisition = ref<RequisitionWithJoins | null>(null);
 
 onMounted(async () => {
     try {
@@ -130,16 +129,20 @@ onMounted(async () => {
             }
             throw fetchError;
         }
-        requisition.value = data;
+        // FIX: Supabase types FK joins as arrays even for many-to-one
+        requisition.value = data as unknown as RequisitionWithJoins;
     } catch (err) {
-        error.value = "ไม่สามารถโหลดข้อมูลใบเบิกได้: " + err.message;
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        error.value =
+            "ไม่สามารถโหลดข้อมูลใบเบิกได้: " +
+            (err instanceof Error ? err.message : String(err));
         console.error(err);
     } finally {
         loading.value = false;
     }
 });
 
-const grandTotal = computed(() => {
+const grandTotal = computed<number>(() => {
     if (!requisition.value || !requisition.value.requisition_items_drugcupsabot)
         return 0;
 
@@ -154,7 +157,7 @@ const grandTotal = computed(() => {
     );
 });
 
-function formatDate(dateString) {
+function formatDate(dateString: string | null): string {
     if (!dateString) return "ยังไม่ได้ส่ง";
     return new Date(dateString).toLocaleString("th-TH", {
         year: "numeric",
@@ -165,8 +168,8 @@ function formatDate(dateString) {
     });
 }
 
-function formatCurrency(value) {
-    if (isNaN(value) || value === null) return "0.00";
+function formatCurrency(value: number | null | undefined): string {
+    if (value === null || value === undefined || isNaN(value)) return "0.00";
     return Number(value).toLocaleString("th-TH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,

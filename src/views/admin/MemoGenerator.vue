@@ -82,19 +82,23 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "@/supabaseClient";
+import type {
+    AccountingSummaryRow,
+    RequisitionPeriod,
+} from "@/types/models";
 
 const router = useRouter();
-const loading = ref(false);
-const error = ref(null);
-const periods = ref([]);
-const selectedPeriod = ref(null);
-const reportData = ref([]);
+const loading = ref<boolean>(false);
+const error = ref<string | null>(null);
+const periods = ref<RequisitionPeriod[]>([]);
+const selectedPeriod = ref<number | null>(null);
+const reportData = ref<AccountingSummaryRow[]>([]);
 
-const grandTotal = computed(() =>
+const grandTotal = computed<number>(() =>
     reportData.value.reduce((sum, pcu) => sum + pcu.total_value, 0),
 );
 
@@ -103,10 +107,10 @@ onMounted(async () => {
         .from("requisition_periods_drugcupsabot")
         .select("id, name")
         .order("start_date", { ascending: false });
-    periods.value = data || [];
+    periods.value = (data ?? []) as unknown as RequisitionPeriod[];
 });
 
-async function fetchReportData() {
+async function fetchReportData(): Promise<void> {
     if (!selectedPeriod.value) return;
     loading.value = true;
     error.value = null;
@@ -119,15 +123,18 @@ async function fetchReportData() {
             },
         );
         if (fetchError) throw fetchError;
-        reportData.value = data;
+        reportData.value = (data ?? []) as unknown as AccountingSummaryRow[];
     } catch (err) {
-        error.value = "เกิดข้อผิดพลาด: " + err.message;
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        error.value =
+            "เกิดข้อผิดพลาด: " +
+            (err instanceof Error ? err.message : String(err));
     } finally {
         loading.value = false;
     }
 }
 
-function printMemo() {
+function printMemo(): void {
     if (!selectedPeriod.value) return;
     const routeData = router.resolve({
         name: "ApprovalMemoPrint",
@@ -136,7 +143,7 @@ function printMemo() {
     window.open(routeData.href, "_blank");
 }
 
-function formatCurrency(value) {
+function formatCurrency(value: number): string {
     return Number(value).toLocaleString("th-TH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,

@@ -61,19 +61,30 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { supabase } from "@/supabaseClient";
+import type { Pcu, PcuPersonnel } from "@/types/models";
 
-const loading = ref(true);
-const error = ref(null);
-const pcuSettings = ref([]);
+type PcuSetting = {
+    pcu_id: number;
+    pcu_name: string;
+    id: number | null;
+    requester_name: string;
+    requester_position: string;
+    receiver_name: string;
+    receiver_position: string;
+};
+
+const loading = ref<boolean>(true);
+const error = ref<string | null>(null);
+const pcuSettings = ref<PcuSetting[]>([]);
 
 onMounted(async () => {
     await fetchSettings();
 });
 
-async function fetchSettings() {
+async function fetchSettings(): Promise<void> {
     loading.value = true;
     error.value = null;
     try {
@@ -88,30 +99,37 @@ async function fetchSettings() {
             .select("*");
         if (personnelError) throw personnelError;
 
-        const settings = pcus.map((pcu) => {
-            const existingPersonnel = personnel.find(
+        const pcusList = (pcus ?? []) as unknown as Pcu[];
+        const personnelList = (personnel ?? []) as unknown as PcuPersonnel[];
+
+        const settings = pcusList.map((pcu) => {
+            const existingPersonnel = personnelList.find(
                 (p) => p.pcu_id === pcu.id,
             );
             return {
                 pcu_id: pcu.id,
                 pcu_name: pcu.name,
-                id: existingPersonnel?.id || null,
+                id: existingPersonnel?.id ?? null,
                 requester_name: existingPersonnel?.requester_name || "",
-                requester_position: existingPersonnel?.requester_position || "",
+                requester_position:
+                    existingPersonnel?.requester_position || "",
                 receiver_name: existingPersonnel?.receiver_name || "",
                 receiver_position: existingPersonnel?.receiver_position || "",
             };
         });
         pcuSettings.value = settings;
     } catch (err) {
-        error.value = "ไม่สามารถโหลดข้อมูลการตั้งค่าได้: " + err.message;
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        error.value =
+            "ไม่สามารถโหลดข้อมูลการตั้งค่าได้: " +
+            (err instanceof Error ? err.message : String(err));
         console.error(err);
     } finally {
         loading.value = false;
     }
 }
 
-async function savePcuPersonnel(pcu) {
+async function savePcuPersonnel(pcu: PcuSetting): Promise<void> {
     try {
         const upsertData = {
             pcu_id: pcu.pcu_id,
@@ -130,7 +148,11 @@ async function savePcuPersonnel(pcu) {
         alert(`บันทึกข้อมูลของ ${pcu.pcu_name} เรียบร้อยแล้ว`);
         await fetchSettings();
     } catch (err) {
-        alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        alert(
+            "เกิดข้อผิดพลาดในการบันทึก: " +
+                (err instanceof Error ? err.message : String(err)),
+        );
         console.error(err);
     }
 }

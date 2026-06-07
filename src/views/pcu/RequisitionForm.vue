@@ -126,31 +126,41 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "@/supabaseClient";
 import { useAuthStore } from "@/store/auth";
+import type {
+    Item,
+    RequisitionPeriod,
+    RequisitionStatus,
+} from "@/types/models";
 
-const props = defineProps({
-    periodId: String,
-    requisitionId: String,
-});
+type RequisitionEntry = {
+    quantity: number | null;
+    onHand: number | null;
+};
+
+const props = defineProps<{
+    periodId: string;
+    requisitionId?: string;
+}>();
 
 const router = useRouter();
 const auth = useAuthStore();
 
-const loading = ref(true);
-const isSubmitting = ref(false);
-const error = ref(null);
-const items = ref([]);
-const periodInfo = ref(null);
-const requisitionData = ref({});
-const totalValue = ref(0);
-const searchTerm = ref("");
+const loading = ref<boolean>(true);
+const isSubmitting = ref<boolean>(false);
+const error = ref<string | null>(null);
+const items = ref<Item[]>([]);
+const periodInfo = ref<Pick<RequisitionPeriod, "name"> | null>(null);
+const requisitionData = ref<Record<number, RequisitionEntry>>({});
+const totalValue = ref<number>(0);
+const searchTerm = ref<string>("");
 
-const isEditing = computed(
-    () => props.requisitionId && props.requisitionId !== "new",
+const isEditing = computed<boolean>(
+    () => props.requisitionId !== undefined && props.requisitionId !== "new",
 );
 
 onMounted(async () => {
@@ -170,7 +180,7 @@ onMounted(async () => {
             .order("category_order", { ascending: true })
             .order("item_order", { ascending: true });
         if (itemsError) throw itemsError;
-        items.value = itemsData;
+        items.value = (itemsData ?? []) as unknown as Item[];
 
         items.value.forEach((item) => {
             requisitionData.value[item.id] = { quantity: null, onHand: null };
@@ -197,21 +207,24 @@ onMounted(async () => {
             }
         }
     } catch (err) {
-        error.value = "ไม่สามารถโหลดข้อมูลได้: " + err.message;
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        error.value =
+            "ไม่สามารถโหลดข้อมูลได้: " +
+            (err instanceof Error ? err.message : String(err));
         console.error(err);
     } finally {
         loading.value = false;
     }
 });
 
-const filteredItems = computed(() => {
+const filteredItems = computed<Item[]>(() => {
     if (!searchTerm.value) return items.value;
     return items.value.filter((item) =>
         item.name.toLowerCase().includes(searchTerm.value.toLowerCase()),
     );
 });
 
-function calculateValue(item) {
+function calculateValue(item: Item): number {
     if (!item.is_available) {
         if (requisitionData.value[item.id]?.quantity) {
             requisitionData.value[item.id].quantity = 0;
@@ -222,21 +235,21 @@ function calculateValue(item) {
     return quantity * item.price_per_unit;
 }
 
-function updateTotal() {
+function updateTotal(): void {
     totalValue.value = items.value.reduce((sum, item) => {
         return sum + calculateValue(item);
     }, 0);
 }
 
-function formatCurrency(value) {
-    if (isNaN(value) || value === null) return "0.00";
+function formatCurrency(value: number | null): string {
+    if (value === null || isNaN(value)) return "0.00";
     return Number(value).toLocaleString("th-TH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     });
 }
 
-async function saveRequisition(status) {
+async function saveRequisition(status: RequisitionStatus): Promise<void> {
     if (!auth.userProfile || !auth.userPcuId) {
         alert("ข้อมูลผู้ใช้ไม่สมบูรณ์");
         return;
@@ -244,7 +257,11 @@ async function saveRequisition(status) {
     isSubmitting.value = true;
 
     try {
-        let currentRequisitionId = isEditing.value ? props.requisitionId : null;
+        let currentRequisitionId: number | null = isEditing.value
+            ? // FIX: route params are always strings, but DB column is number;
+              // strict TS requires explicit conversion (preserved coercion behavior)
+              Number(props.requisitionId)
+            : null;
 
         if (!isEditing.value) {
             const { data: newHeader, error: headerError } = await supabase
@@ -270,7 +287,11 @@ async function saveRequisition(status) {
 
         const itemsToInsert = Object.entries(requisitionData.value)
             .filter(([itemId, entry]) => {
-                const itemDetails = items.value.find((i) => i.id == itemId);
+                // FIX: original used `i.id == itemId` (loose equality);
+                // strict TS requires Number() conversion to compare number vs string
+                const itemDetails = items.value.find(
+                    (i) => i.id === Number(itemId),
+                );
                 return (
                     entry.quantity > 0 &&
                     entry.quantity !== null &&
@@ -279,13 +300,16 @@ async function saveRequisition(status) {
                 );
             })
             .map(([itemId, entry]) => {
-                const itemDetails = items.value.find((i) => i.id == itemId);
+                // FIX: same as above
+                const itemDetails = items.value.find(
+                    (i) => i.id === Number(itemId),
+                );
                 return {
                     requisition_id: currentRequisitionId,
                     item_id: Number(itemId),
                     quantity: entry.quantity,
                     on_hand_quantity: entry.onHand,
-                    price_at_request: itemDetails.price_per_unit,
+                    price_at_request: itemDetails!.price_per_unit,
                 };
             });
 
@@ -311,18 +335,22 @@ async function saveRequisition(status) {
         );
         router.push("/pcu/dashboard");
     } catch (err) {
-        alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        alert(
+            "เกิดข้อผิดพลาดในการบันทึก: " +
+                (err instanceof Error ? err.message : String(err)),
+        );
         console.error(err);
     } finally {
         isSubmitting.value = false;
     }
 }
 
-function saveDraft() {
+function saveDraft(): void {
     saveRequisition("draft");
 }
 
-function submitForm() {
+function submitForm(): void {
     if (
         confirm(
             "คุณต้องการยืนยันการส่งใบเบิกนี้ใช่หรือไม่? เมื่อส่งแล้วจะไม่สามารถแก้ไขได้อีก",

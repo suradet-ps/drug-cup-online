@@ -57,18 +57,29 @@
     <div v-else class="loading">กำลังเตรียมข้อมูลสำหรับพิมพ์...</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { supabase } from "@/supabaseClient";
+import type { Pcu, RequisitionPeriod } from "@/types/models";
+
+type ProcessedItem = {
+    item_id: number;
+    item_name: string;
+    unit_pack: string;
+    total_quantity: number;
+    pcu_breakdown: Record<number, number>;
+    category_order: number | null;
+    item_order: number | null;
+};
 
 const route = useRoute();
-const processedData = ref([]);
-const periodInfo = ref(null);
-const pcuList = ref([]);
-const loading = ref(true);
+const processedData = ref<ProcessedItem[]>([]);
+const periodInfo = ref<Pick<RequisitionPeriod, "name"> | null>(null);
+const pcuList = ref<Pcu[]>([]);
+const loading = ref<boolean>(true);
 
-const periodId = route.query.periodId;
+const periodId = route.query.periodId as string | undefined;
 
 onMounted(async () => {
     if (!periodId) {
@@ -88,7 +99,7 @@ onMounted(async () => {
             .from("pcus_drugcupsabot")
             .select("id, name")
             .order("name");
-        pcuList.value = pcusData;
+        pcuList.value = (pcusData ?? []) as unknown as Pcu[];
 
         const { data, error } = await supabase
             .from("requisition_items_drugcupsabot")
@@ -104,44 +115,73 @@ onMounted(async () => {
 
         if (error) throw error;
 
-        const summary = data.reduce((acc, current) => {
-            if (
-                !current.requisitions_drugcupsabot ||
-                !current.items_drugcupsabot
-            ) {
-                console.warn(
-                    "Skipping orphaned requisition item during print process:",
-                    current,
-                );
-                return acc;
-            }
-
-            const itemId = current.items_drugcupsabot.id;
-            const itemName = current.items_drugcupsabot.name;
-            const unitPack = current.items_drugcupsabot.unit_pack;
-            const categoryOrder = current.items_drugcupsabot.category_order;
-            const itemOrder = current.items_drugcupsabot.item_order;
-            const pcuId = current.requisitions_drugcupsabot.pcu_id;
-            const qty = current.approved_quantity || 0;
-
-            if (!acc[itemId]) {
-                acc[itemId] = {
-                    item_id: itemId,
-                    item_name: itemName,
-                    unit_pack: unitPack,
-                    total_quantity: 0,
-                    pcu_breakdown: {},
-                    category_order: categoryOrder,
-                    item_order: itemOrder,
+        const summary: Record<number, ProcessedItem> = data.reduce(
+            (acc, current) => {
+                // FIX: Supabase types FK joins as arrays even for many-to-one
+                const cur = current as unknown as {
+                    requisitions_drugcupsabot:
+                        | { pcu_id: number; status: string; period_id: number }
+                        | Array<{ pcu_id: number; status: string; period_id: number }>;
+                    items_drugcupsabot:
+                        | {
+                              id: number;
+                              name: string;
+                              unit_pack: string;
+                              category_order: number | null;
+                              item_order: number | null;
+                          }
+                        | Array<{
+                              id: number;
+                              name: string;
+                              unit_pack: string;
+                              category_order: number | null;
+                              item_order: number | null;
+                          }>;
+                    approved_quantity: number | null;
                 };
-            }
+                const reqJoin = Array.isArray(cur.requisitions_drugcupsabot)
+                    ? cur.requisitions_drugcupsabot[0]
+                    : cur.requisitions_drugcupsabot;
+                const itemJoin = Array.isArray(cur.items_drugcupsabot)
+                    ? cur.items_drugcupsabot[0]
+                    : cur.items_drugcupsabot;
 
-            acc[itemId].total_quantity += qty;
-            acc[itemId].pcu_breakdown[pcuId] =
-                (acc[itemId].pcu_breakdown[pcuId] || 0) + qty;
+                if (!reqJoin || !itemJoin) {
+                    console.warn(
+                        "Skipping orphaned requisition item during print process:",
+                        current,
+                    );
+                    return acc;
+                }
 
-            return acc;
-        }, {});
+                const itemId = itemJoin.id;
+                const itemName = itemJoin.name;
+                const unitPack = itemJoin.unit_pack;
+                const categoryOrder = itemJoin.category_order;
+                const itemOrder = itemJoin.item_order;
+                const pcuId = reqJoin.pcu_id;
+                const qty = cur.approved_quantity || 0;
+
+                if (!acc[itemId]) {
+                    acc[itemId] = {
+                        item_id: itemId,
+                        item_name: itemName,
+                        unit_pack: unitPack,
+                        total_quantity: 0,
+                        pcu_breakdown: {},
+                        category_order: categoryOrder,
+                        item_order: itemOrder,
+                    };
+                }
+
+                acc[itemId].total_quantity += qty;
+                acc[itemId].pcu_breakdown[pcuId] =
+                    (acc[itemId].pcu_breakdown[pcuId] || 0) + qty;
+
+                return acc;
+            },
+            {} as Record<number, ProcessedItem>,
+        );
 
         processedData.value = Object.values(summary).sort((a, b) => {
             const categoryDiff =
@@ -159,13 +199,14 @@ onMounted(async () => {
         }, 500);
     } catch (err) {
         console.error("Error processing requisitions for print:", err);
-        document.body.innerHTML = `เกิดข้อผิดพลาด: ${err.message}`;
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        document.body.innerHTML = `เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`;
     } finally {
         loading.value = false;
     }
 });
 
-function formatDate(dateString) {
+function formatDate(dateString: string | Date): string {
     const date = new Date(dateString);
     return date.toLocaleDateString("th-TH", {
         day: "numeric",

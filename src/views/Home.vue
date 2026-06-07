@@ -26,14 +26,14 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useAuthStore } from "@/store/auth";
 import { useRouter } from "vue-router";
 
 const auth = useAuthStore();
 const router = useRouter();
 
-function goTo(path) {
+function goTo(path: string): void {
     router.push(path);
 }
 </script>

@@ -196,19 +196,35 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { supabase } from "@/supabaseClient";
+import type { Item } from "@/types/models";
 
-const loading = ref(true);
-const isSubmitting = ref(false);
-const error = ref(null);
-const items = ref([]);
-const searchTerm = ref("");
-const showAddItemModal = ref(false);
-const newCategoryName = ref("");
+type NewItem = {
+    name: string;
+    price_per_unit: number;
+    unit_pack: string;
+    category: string;
+    is_active: boolean;
+    is_available: boolean;
+    notes: string | null;
+};
 
-const newItem = ref({
+type NewItemWithOrders = NewItem & {
+    category_order: number;
+    item_order: number;
+};
+
+const loading = ref<boolean>(true);
+const isSubmitting = ref<boolean>(false);
+const error = ref<string | null>(null);
+const items = ref<Item[]>([]);
+const searchTerm = ref<string>("");
+const showAddItemModal = ref<boolean>(false);
+const newCategoryName = ref<string>("");
+
+const newItem = ref<NewItem>({
     name: "",
     price_per_unit: 0,
     unit_pack: "",
@@ -218,7 +234,7 @@ const newItem = ref({
     notes: null,
 });
 
-const uniqueCategories = computed(() => {
+const uniqueCategories = computed<string[]>(() => {
     if (!items.value) return [];
     const categories = items.value.map((item) => item.category);
     return [...new Set(categories)].sort();
@@ -228,7 +244,7 @@ onMounted(async () => {
     await fetchItems();
 });
 
-async function fetchItems() {
+async function fetchItems(): Promise<void> {
     try {
         loading.value = true;
         const { data, error: fetchError } = await supabase
@@ -239,23 +255,26 @@ async function fetchItems() {
             .order("name", { ascending: true });
 
         if (fetchError) throw fetchError;
-        items.value = data;
+        items.value = (data ?? []) as unknown as Item[];
     } catch (err) {
-        error.value = "ไม่สามารถโหลดข้อมูลรายการยาได้: " + err.message;
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        error.value =
+            "ไม่สามารถโหลดข้อมูลรายการยาได้: " +
+            (err instanceof Error ? err.message : String(err));
         console.error(err);
     } finally {
         loading.value = false;
     }
 }
 
-const filteredItems = computed(() => {
+const filteredItems = computed<Item[]>(() => {
     if (!searchTerm.value) return items.value;
     return items.value.filter((item) =>
         item.name.toLowerCase().includes(searchTerm.value.toLowerCase()),
     );
 });
 
-async function updateItem(item) {
+async function updateItem(item: Item): Promise<void> {
     try {
         const {
             id,
@@ -274,12 +293,16 @@ async function updateItem(item) {
         if (updateError) throw updateError;
         alert(`อัปเดตรายการ "${item.name}" เรียบร้อยแล้ว`);
     } catch (err) {
-        alert("เกิดข้อผิดพลาดในการอัปเดต: " + err.message);
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        alert(
+            "เกิดข้อผิดพลาดในการอัปเดต: " +
+                (err instanceof Error ? err.message : String(err)),
+        );
         console.error(err);
     }
 }
 
-function openAddItemModal() {
+function openAddItemModal(): void {
     newItem.value = {
         name: "",
         price_per_unit: 0,
@@ -293,7 +316,7 @@ function openAddItemModal() {
     showAddItemModal.value = true;
 }
 
-async function handleAddItem() {
+async function handleAddItem(): Promise<void> {
     isSubmitting.value = true;
     try {
         let finalCategory = newItem.value.category;
@@ -305,7 +328,12 @@ async function handleAddItem() {
             finalCategory = newCategoryName.value.trim();
         }
 
-        const dataToInsert = { ...newItem.value, category: finalCategory };
+        const dataToInsert: NewItemWithOrders = {
+            ...newItem.value,
+            category: finalCategory,
+            category_order: 0,
+            item_order: 0,
+        };
         if (dataToInsert.notes === "") dataToInsert.notes = null;
 
         const existingCategory = items.value.find(
@@ -313,14 +341,17 @@ async function handleAddItem() {
         );
 
         if (existingCategory) {
-            dataToInsert.category_order = existingCategory.category_order;
+            dataToInsert.category_order = existingCategory.category_order ?? 0;
             const maxItemOrder = items.value
                 .filter((item) => item.category === finalCategory)
-                .reduce((max, item) => Math.max(max, item.item_order || 0), 0);
+                .reduce(
+                    (max, item) => Math.max(max, item.item_order ?? 0),
+                    0,
+                );
             dataToInsert.item_order = maxItemOrder + 1;
         } else {
             const maxCategoryOrder = items.value.reduce(
-                (max, item) => Math.max(max, item.category_order || 0),
+                (max, item) => Math.max(max, item.category_order ?? 0),
                 0,
             );
             dataToInsert.category_order = maxCategoryOrder + 1;
@@ -334,11 +365,16 @@ async function handleAddItem() {
 
         if (insertError) throw insertError;
 
-        alert(`เพิ่มรายการ "${data[0].name}" สำเร็จ`);
+        const inserted = (data ?? []) as unknown as Item[];
+        alert(`เพิ่มรายการ "${inserted[0]?.name}" สำเร็จ`);
         showAddItemModal.value = false;
         await fetchItems();
     } catch (err) {
-        alert("เกิดข้อผิดพลาดในการเพิ่มรายการ: " + err.message);
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        alert(
+            "เกิดข้อผิดพลาดในการเพิ่มรายการ: " +
+                (err instanceof Error ? err.message : String(err)),
+        );
         console.error(err);
     } finally {
         isSubmitting.value = false;

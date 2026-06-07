@@ -98,21 +98,34 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "@/supabaseClient";
 import { useAuthStore } from "@/store/auth";
+import type {
+    RequisitionPeriod,
+    RequisitionStatus,
+} from "@/types/models";
+
+type ExistingRequisition = {
+    id: number;
+    period_id: number;
+    status: RequisitionStatus;
+    created_at: string;
+    submitted_at: string | null;
+    requisition_periods_drugcupsabot: { name: string };
+};
 
 const router = useRouter();
 const auth = useAuthStore();
 
-const loading = ref(true);
-const error = ref(null);
-const openPeriods = ref([]);
-const existingRequisitions = ref([]);
+const loading = ref<boolean>(true);
+const error = ref<string | null>(null);
+const openPeriods = ref<RequisitionPeriod[]>([]);
+const existingRequisitions = ref<ExistingRequisition[]>([]);
 
-const historyRequisitions = computed(() => {
+const historyRequisitions = computed<ExistingRequisition[]>(() => {
     return existingRequisitions.value
         .filter((req) => req.status !== "draft")
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -132,7 +145,8 @@ onMounted(async () => {
             .eq("status", "open")
             .order("start_date", { ascending: false });
         if (periodsError) throw periodsError;
-        openPeriods.value = periodsData;
+        // FIX: Supabase types join as array even for many-to-one; cast
+        openPeriods.value = (periodsData ?? []) as unknown as RequisitionPeriod[];
 
         const { data: reqsData, error: reqsError } = await supabase
             .from("requisitions_drugcupsabot")
@@ -141,7 +155,8 @@ onMounted(async () => {
             )
             .eq("pcu_id", auth.userPcuId);
         if (reqsError) throw reqsError;
-        existingRequisitions.value = reqsData;
+        // FIX: same FK join typing caveat as above
+        existingRequisitions.value = (reqsData ?? []) as unknown as ExistingRequisition[];
     } catch (err) {
         error.value = "ไม่สามารถโหลดข้อมูลได้";
         console.error(err);
@@ -150,33 +165,33 @@ onMounted(async () => {
     }
 });
 
-function hasRequisition(periodId) {
+function hasRequisition(periodId: number): boolean {
     return existingRequisitions.value.some((req) => req.period_id === periodId);
 }
-function getRequisitionStatus(periodId) {
+function getRequisitionStatus(periodId: number): RequisitionStatus | null {
     const req = existingRequisitions.value.find(
         (req) => req.period_id === periodId,
     );
     return req ? req.status : null;
 }
-function getRequisitionId(periodId) {
+function getRequisitionId(periodId: number): number | null {
     const req = existingRequisitions.value.find(
         (req) => req.period_id === periodId,
     );
     return req ? req.id : null;
 }
-function formatDate(dateString) {
+function formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString("th-TH", {
         year: "numeric",
         month: "long",
         day: "numeric",
     });
 }
-function formatSubmitDate(dateString) {
+function formatSubmitDate(dateString: string | null): string {
     if (!dateString) return "ฉบับร่าง";
     return new Date(dateString).toLocaleString("th-TH");
 }
-function goToRequisition(periodId, requisitionId) {
+function goToRequisition(periodId: number, requisitionId: number | null): void {
     router.push({
         name: "RequisitionForm",
         params: { periodId, requisitionId: requisitionId || "new" },

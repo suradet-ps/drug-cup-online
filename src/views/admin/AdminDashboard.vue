@@ -96,19 +96,28 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { supabase } from "@/supabaseClient";
+import type { RequisitionStatus } from "@/types/models";
 
-const loading = ref(true);
-const error = ref(null);
-const requisitions = ref([]);
+type DashboardRequisition = {
+    id: number;
+    submitted_at: string | null;
+    status: RequisitionStatus;
+    pcus_drugcupsabot: { name: string };
+    requisition_periods_drugcupsabot: { name: string };
+};
 
-const submittedRequisitions = computed(() => {
+const loading = ref<boolean>(true);
+const error = ref<string | null>(null);
+const requisitions = ref<DashboardRequisition[]>([]);
+
+const submittedRequisitions = computed<DashboardRequisition[]>(() => {
     return requisitions.value.filter((req) => req.status === "submitted");
 });
 
-const approvedRequisitions = computed(() => {
+const approvedRequisitions = computed<DashboardRequisition[]>(() => {
     return requisitions.value.filter((req) => req.status === "approved");
 });
 
@@ -129,7 +138,8 @@ onMounted(async () => {
             .order("submitted_at", { ascending: true });
 
         if (fetchError) throw fetchError;
-        requisitions.value = data;
+        // FIX: Supabase types FK joins as arrays even for many-to-one
+        requisitions.value = (data ?? []) as unknown as DashboardRequisition[];
     } catch (err) {
         error.value = "เกิดข้อผิดพลาดในการโหลดข้อมูลใบเบิก";
         console.error(err);
@@ -138,7 +148,7 @@ onMounted(async () => {
     }
 });
 
-function formatDate(dateString) {
+function formatDate(dateString: string | null): string {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleString("th-TH");
 }

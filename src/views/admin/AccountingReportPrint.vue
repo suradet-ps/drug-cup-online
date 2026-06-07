@@ -85,18 +85,22 @@
     <div v-else class="loading">กำลังเตรียมข้อมูลสำหรับพิมพ์...</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { supabase } from "@/supabaseClient";
+import type {
+    AccountingSummaryRow,
+    RequisitionPeriod,
+} from "@/types/models";
 
 const route = useRoute();
-const loading = ref(true);
-const reportData = ref([]);
-const periodInfo = ref(null);
-const periodId = route.query.periodId;
+const loading = ref<boolean>(true);
+const reportData = ref<AccountingSummaryRow[]>([]);
+const periodInfo = ref<Pick<RequisitionPeriod, "name"> | null>(null);
+const periodId = route.query.periodId as string | undefined;
 
-const grandTotal = computed(() => {
+const grandTotal = computed<number>(() => {
     return reportData.value.reduce((sum, pcu) => sum + pcu.total_value, 0);
 });
 
@@ -120,26 +124,28 @@ onMounted(async () => {
             },
         );
         if (fetchError) throw fetchError;
-        reportData.value = data;
+        reportData.value =
+            (data ?? []) as unknown as AccountingSummaryRow[];
 
         setTimeout(() => window.print(), 500);
     } catch (err) {
         console.error("Error fetching print data:", err);
-        document.body.innerHTML = `เกิดข้อผิดพลาด: ${err.message}`;
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        document.body.innerHTML = `เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`;
     } finally {
         loading.value = false;
     }
 });
 
-function formatDate(date) {
+function formatDate(date: Date): string {
     return date.toLocaleDateString("th-TH", {
         day: "numeric",
         month: "long",
         year: "numeric",
     });
 }
-function formatCurrency(value) {
-    if (isNaN(value) || value === null) return "0.00";
+function formatCurrency(value: number | null): string {
+    if (value === null || isNaN(value)) return "0.00";
     return Number(value).toLocaleString("th-TH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,

@@ -97,19 +97,29 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "@/supabaseClient";
+import type { Pcu, RequisitionPeriod } from "@/types/models";
+
+type ProcessedItem = {
+    item_id: number;
+    item_name: string;
+    total_quantity: number;
+    pcu_breakdown: Record<number, number>;
+    category_order: number | null;
+    item_order: number | null;
+};
 
 const router = useRouter();
-const loading = ref(false);
-const error = ref(null);
-const periods = ref([]);
-const pcuList = ref([]);
-const selectedPeriod = ref(null);
-const selectedPcu = ref("all");
-const processedData = ref([]);
+const loading = ref<boolean>(false);
+const error = ref<string | null>(null);
+const periods = ref<RequisitionPeriod[]>([]);
+const pcuList = ref<Pcu[]>([]);
+const selectedPeriod = ref<number | null>(null);
+const selectedPcu = ref<number | "all">("all");
+const processedData = ref<ProcessedItem[]>([]);
 
 onMounted(async () => {
     try {
@@ -117,19 +127,19 @@ onMounted(async () => {
             .from("requisition_periods_drugcupsabot")
             .select("id, name")
             .order("start_date", { ascending: false });
-        periods.value = periodsData || [];
+        periods.value = (periodsData ?? []) as unknown as RequisitionPeriod[];
         const { data: pcusData } = await supabase
             .from("pcus_drugcupsabot")
             .select("id, name")
             .order("name");
-        pcuList.value = pcusData || [];
+        pcuList.value = (pcusData ?? []) as unknown as Pcu[];
     } catch (err) {
         error.value = "ไม่สามารถโหลดข้อมูลเริ่มต้นได้";
         console.error(err);
     }
 });
 
-async function processRequisitions() {
+async function processRequisitions(): Promise<void> {
     if (!selectedPeriod.value) return;
     loading.value = true;
     error.value = null;
@@ -150,39 +160,68 @@ async function processRequisitions() {
 
         if (fetchError) throw fetchError;
 
-        const summary = data.reduce((acc, current) => {
-            if (
-                !current.requisitions_drugcupsabot ||
-                !current.items_drugcupsabot
-            ) {
-                console.warn("Skipping orphaned requisition item:", current);
+        const summary: Record<number, ProcessedItem> = data.reduce(
+            (acc, current) => {
+                // FIX: Supabase types FK joins as arrays even for many-to-one
+                const req = (
+                    current as unknown as {
+                        requisitions_drugcupsabot:
+                            | { pcu_id: number; status: string; period_id: number }
+                            | Array<{ pcu_id: number; status: string; period_id: number }>;
+                        items_drugcupsabot:
+                            | {
+                                  id: number;
+                                  name: string;
+                                  category_order: number | null;
+                                  item_order: number | null;
+                              }
+                            | Array<{
+                                  id: number;
+                                  name: string;
+                                  category_order: number | null;
+                                  item_order: number | null;
+                              }>;
+                        approved_quantity: number | null;
+                    }
+                );
+                const reqJoin = Array.isArray(req.requisitions_drugcupsabot)
+                    ? req.requisitions_drugcupsabot[0]
+                    : req.requisitions_drugcupsabot;
+                const itemJoin = Array.isArray(req.items_drugcupsabot)
+                    ? req.items_drugcupsabot[0]
+                    : req.items_drugcupsabot;
+
+                if (!reqJoin || !itemJoin) {
+                    console.warn("Skipping orphaned requisition item:", current);
+                    return acc;
+                }
+
+                const itemId = itemJoin.id;
+                const itemName = itemJoin.name;
+                const categoryOrder = itemJoin.category_order;
+                const itemOrder = itemJoin.item_order;
+                const pcuId = reqJoin.pcu_id;
+                const qty = req.approved_quantity || 0;
+
+                if (!acc[itemId]) {
+                    acc[itemId] = {
+                        item_id: itemId,
+                        item_name: itemName,
+                        total_quantity: 0,
+                        pcu_breakdown: {},
+                        category_order: categoryOrder,
+                        item_order: itemOrder,
+                    };
+                }
+
+                acc[itemId].total_quantity += qty;
+                acc[itemId].pcu_breakdown[pcuId] =
+                    (acc[itemId].pcu_breakdown[pcuId] || 0) + qty;
+
                 return acc;
-            }
-
-            const itemId = current.items_drugcupsabot.id;
-            const itemName = current.items_drugcupsabot.name;
-            const categoryOrder = current.items_drugcupsabot.category_order;
-            const itemOrder = current.items_drugcupsabot.item_order;
-            const pcuId = current.requisitions_drugcupsabot.pcu_id;
-            const qty = current.approved_quantity || 0;
-
-            if (!acc[itemId]) {
-                acc[itemId] = {
-                    item_id: itemId,
-                    item_name: itemName,
-                    total_quantity: 0,
-                    pcu_breakdown: {},
-                    category_order: categoryOrder,
-                    item_order: itemOrder,
-                };
-            }
-
-            acc[itemId].total_quantity += qty;
-            acc[itemId].pcu_breakdown[pcuId] =
-                (acc[itemId].pcu_breakdown[pcuId] || 0) + qty;
-
-            return acc;
-        }, {});
+            },
+            {} as Record<number, ProcessedItem>,
+        );
 
         processedData.value = Object.values(summary).sort((a, b) => {
             const categoryDiff =
@@ -202,18 +241,18 @@ async function processRequisitions() {
     }
 }
 
-function getPcuName(pcuId) {
+function getPcuName(pcuId: number): string {
     return pcuList.value.find((p) => p.id === pcuId)?.name || "N/A";
 }
 
-function getDisplayQuantity(item) {
+function getDisplayQuantity(item: ProcessedItem): number {
     if (selectedPcu.value === "all") {
         return item.total_quantity;
     }
     return item.pcu_breakdown[selectedPcu.value] || 0;
 }
 
-function printSummary() {
+function printSummary(): void {
     if (!selectedPeriod.value) {
         alert("กรุณาเลือกรอบเบิกก่อนพิมพ์");
         return;

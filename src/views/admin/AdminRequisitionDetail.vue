@@ -139,21 +139,29 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { supabase } from "@/supabaseClient";
+import type { RequisitionWithJoins } from "@/types/models";
 
-const props = defineProps({
-    requisitionId: String,
-});
+type EditableItem = {
+    id: number;
+    quantity: number;
+    on_hand_quantity: number | null;
+    approved_quantity: number;
+    price_at_request: number;
+    items_drugcupsabot: { name: string; unit_pack: string };
+};
 
-const loading = ref(true);
-const error = ref(null);
-const requisition = ref(null);
-const editableItems = ref([]);
-const isUpdating = ref(false);
+const props = defineProps<{ requisitionId: string }>();
 
-async function fetchRequisition() {
+const loading = ref<boolean>(true);
+const error = ref<string | null>(null);
+const requisition = ref<RequisitionWithJoins | null>(null);
+const editableItems = ref<EditableItem[]>([]);
+const isUpdating = ref<boolean>(false);
+
+async function fetchRequisition(): Promise<void> {
     try {
         loading.value = true;
         error.value = null;
@@ -176,16 +184,20 @@ async function fetchRequisition() {
 
         if (fetchError) throw fetchError;
 
-        requisition.value = data;
+        // FIX: Supabase types FK joins as arrays even for many-to-one
+        requisition.value = data as unknown as RequisitionWithJoins;
 
-        editableItems.value = data.requisition_items_drugcupsabot.map(
+        editableItems.value = (data.requisition_items_drugcupsabot as unknown as EditableItem[]).map(
             (item) => ({
                 ...item,
                 approved_quantity: item.approved_quantity ?? item.quantity,
             }),
         );
     } catch (err) {
-        error.value = "ไม่สามารถโหลดข้อมูลได้: " + err.message;
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        error.value =
+            "ไม่สามารถโหลดข้อมูลได้: " +
+            (err instanceof Error ? err.message : String(err));
         console.error(err);
     } finally {
         loading.value = false;
@@ -194,7 +206,7 @@ async function fetchRequisition() {
 
 onMounted(fetchRequisition);
 
-const grandTotalApproved = computed(() => {
+const grandTotalApproved = computed<number>(() => {
     if (!editableItems.value) return 0;
     return editableItems.value.reduce((sum, item) => {
         const quantity = item.approved_quantity || 0;
@@ -203,7 +215,7 @@ const grandTotalApproved = computed(() => {
     }, 0);
 });
 
-async function saveAndApprove() {
+async function saveAndApprove(): Promise<void> {
     if (
         !confirm(
             "ยืนยันการบันทึกและอนุมัติใบเบิกนี้? การกระทำนี้จะอัปเดตจำนวนที่อนุมัติทั้งหมด",
@@ -235,14 +247,18 @@ async function saveAndApprove() {
         alert("บันทึกและอนุมัติใบเบิกเรียบร้อย");
         await fetchRequisition();
     } catch (err) {
-        alert("เกิดข้อผิดพลาด: " + err.message);
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        alert(
+            "เกิดข้อผิดพลาด: " +
+                (err instanceof Error ? err.message : String(err)),
+        );
         console.error(err);
     } finally {
         isUpdating.value = false;
     }
 }
 
-async function fulfillRequisition() {
+async function fulfillRequisition(): Promise<void> {
     if (!confirm("ยืนยันการจ่ายเวชภัณฑ์ตามจำนวนที่อนุมัติแล้วใช่หรือไม่?"))
         return;
 
@@ -257,14 +273,18 @@ async function fulfillRequisition() {
         alert("ยืนยันการจ่ายเวชภัณฑ์เรียบร้อย");
         await fetchRequisition();
     } catch (err) {
-        alert("เกิดข้อผิดพลาด: " + err.message);
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        alert(
+            "เกิดข้อผิดพลาด: " +
+                (err instanceof Error ? err.message : String(err)),
+        );
         console.error(err);
     } finally {
         isUpdating.value = false;
     }
 }
 
-function formatDate(dateString) {
+function formatDate(dateString: string | null): string {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleString("th-TH", {
         year: "numeric",
@@ -274,8 +294,8 @@ function formatDate(dateString) {
         minute: "2-digit",
     });
 }
-function formatCurrency(value) {
-    if (isNaN(value) || value === null) return "0.00";
+function formatCurrency(value: number | null): string {
+    if (value === null || isNaN(value)) return "0.00";
     return Number(value).toLocaleString("th-TH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,

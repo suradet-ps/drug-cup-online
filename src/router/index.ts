@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
 import { useAuthStore } from "@/store/auth";
 
 // Import Components
@@ -28,7 +28,7 @@ import MemoGenerator from "@/views/admin/MemoGenerator.vue";
 import ApprovalMemoPrint from "@/views/admin/ApprovalMemoPrint.vue";
 
 // Define Routes
-const routes = [
+const routes: RouteRecordRaw[] = [
   // Public Routes
   {
     path: "/login",

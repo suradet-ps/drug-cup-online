@@ -146,18 +146,34 @@
     <div v-else class="loading">กำลังเตรียมข้อมูลสำหรับพิมพ์...</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { supabase } from "@/supabaseClient";
+import type { PcuPersonnel } from "@/types/models";
+
+type PrintRequisitionItem = {
+    quantity: number;
+    approved_quantity: number | null;
+    items_drugcupsabot: { name: string; unit_pack: string };
+};
+
+type PrintRequisition = {
+    id: number;
+    status: string;
+    submitted_at: string | null;
+    pcus_drugcupsabot: { id: number; name: string };
+    requisition_periods_drugcupsabot: { name: string };
+    requisition_items_drugcupsabot: PrintRequisitionItem[];
+};
 
 const route = useRoute();
-const requisition = ref(null);
-const personnel = ref(null);
-const loading = ref(true);
-const requisitionId = route.query.id;
+const requisition = ref<PrintRequisition | null>(null);
+const personnel = ref<PcuPersonnel | null>(null);
+const loading = ref<boolean>(true);
+const requisitionId = route.query.id as string | undefined;
 
-const emptyRows = computed(() => {
+const emptyRows = computed<number>(() => {
     if (!requisition.value) return 0;
     const itemCount = requisition.value.requisition_items_drugcupsabot.length;
     return Math.max(0, 1 - itemCount);
@@ -188,7 +204,9 @@ onMounted(async () => {
                 .single();
 
         if (requisitionError) throw requisitionError;
-        requisition.value = requisitionData;
+        // FIX: Supabase types FK joins as arrays even for many-to-one
+        requisition.value =
+            requisitionData as unknown as PrintRequisition;
 
         if (requisitionData && requisitionData.pcus_drugcupsabot?.id) {
             const pcuId = requisitionData.pcus_drugcupsabot.id;
@@ -203,7 +221,7 @@ onMounted(async () => {
                 throw personnelError;
             }
 
-            personnel.value = personnelData;
+            personnel.value = (personnelData ?? null) as unknown as PcuPersonnel;
         }
 
         setTimeout(() => {
@@ -211,13 +229,14 @@ onMounted(async () => {
         }, 500);
     } catch (err) {
         console.error("Error fetching data for printing:", err);
-        document.body.innerHTML = `เกิดข้อผิดพลาด: ${err.message}`;
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        document.body.innerHTML = `เกิดข้อผิดพลาด: ${err instanceof Error ? err.message : String(err)}`;
     } finally {
         loading.value = false;
     }
 });
 
-function formatDate(dateString) {
+function formatDate(dateString: string | Date): string {
     const date = new Date(dateString);
     return date.toLocaleDateString("th-TH", {
         day: "numeric",

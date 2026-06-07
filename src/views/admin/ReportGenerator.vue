@@ -138,21 +138,41 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "@/supabaseClient";
 import { utils, writeFile } from "xlsx";
+import type {
+    RequisitionPeriod,
+    RequisitionStatus,
+} from "@/types/models";
+
+type ReportItem = {
+    id: number;
+    quantity: number;
+    approved_quantity: number | null;
+    price_at_request: number;
+    items_drugcupsabot: { name: string; unit_pack: string };
+};
+
+type ReportRequisition = {
+    id: number;
+    status: RequisitionStatus;
+    pcus_drugcupsabot: { name: string };
+    requisition_periods_drugcupsabot: { name: string };
+    requisition_items_drugcupsabot: ReportItem[];
+};
 
 const router = useRouter();
-const loading = ref(false);
-const isGenerating = ref(false);
-const periods = ref([]);
-const requisitionsInPeriod = ref([]);
-const selectedPeriod = ref(null);
-const selectedRequisition = ref(null);
+const loading = ref<boolean>(false);
+const isGenerating = ref<boolean>(false);
+const periods = ref<RequisitionPeriod[]>([]);
+const requisitionsInPeriod = ref<ReportRequisition[]>([]);
+const selectedPeriod = ref<number | null>(null);
+const selectedRequisition = ref<ReportRequisition | null>(null);
 
-const grandTotal = computed(() => {
+const grandTotal = computed<number>(() => {
     if (!selectedRequisition.value) return 0;
     return selectedRequisition.value.requisition_items_drugcupsabot.reduce(
         (sum, item) => {
@@ -171,13 +191,17 @@ onMounted(async () => {
             .from("requisition_periods_drugcupsabot")
             .select("id, name")
             .order("start_date", { ascending: false });
-        periods.value = data || [];
-    } catch (error) {
-        console.error("Error fetching periods:", error);
+        periods.value = (data ?? []) as unknown as RequisitionPeriod[];
+    } catch (err) {
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        console.error(
+            "Error fetching periods:",
+            err instanceof Error ? err.message : String(err),
+        );
     }
 });
 
-async function fetchRequisitionsForPeriod() {
+async function fetchRequisitionsForPeriod(): Promise<void> {
     selectedRequisition.value = null;
     requisitionsInPeriod.value = [];
     if (!selectedPeriod.value) return;
@@ -201,7 +225,9 @@ async function fetchRequisitionsForPeriod() {
             .eq("period_id", selectedPeriod.value);
 
         if (error) throw error;
-        requisitionsInPeriod.value = data;
+        // FIX: Supabase types FK joins as arrays even for many-to-one
+        requisitionsInPeriod.value =
+            (data ?? []) as unknown as ReportRequisition[];
     } catch (err) {
         console.error("Error fetching requisitions:", err);
         alert("ไม่สามารถโหลดข้อมูลใบเบิกได้");
@@ -210,7 +236,7 @@ async function fetchRequisitionsForPeriod() {
     }
 }
 
-function printDocument() {
+function printDocument(): void {
     if (!selectedRequisition.value) {
         alert("กรุณาเลือกใบเบิกที่ต้องการพิมพ์");
         return;
@@ -229,7 +255,7 @@ function printDocument() {
     }, 1000);
 }
 
-function exportToExcel() {
+function exportToExcel(): void {
     if (!selectedRequisition.value) return;
 
     const pcuName = selectedRequisition.value.pcus_drugcupsabot.name;
@@ -257,8 +283,8 @@ function exportToExcel() {
     writeFile(workbook, `ใบเบิก_${pcuName}_${periodName}.xlsx`);
 }
 
-function formatCurrency(value) {
-    if (isNaN(value) || value === null || value === undefined) return "0.00";
+function formatCurrency(value: number | null | undefined): string {
+    if (value === null || value === undefined || isNaN(value)) return "0.00";
     return Number(value).toLocaleString("th-TH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,

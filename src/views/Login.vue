@@ -49,26 +49,28 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { useAuthStore } from "@/store/auth";
 import { useRouter } from "vue-router";
 
-const email = ref("");
-const password = ref("");
-const loading = ref(false);
-const errorMessage = ref("");
+const email = ref<string>("");
+const password = ref<string>("");
+const loading = ref<boolean>(false);
+const errorMessage = ref<string>("");
 const authStore = useAuthStore();
 const router = useRouter();
 
-async function handleLogin() {
+async function handleLogin(): Promise<void> {
     loading.value = true;
     errorMessage.value = "";
     try {
         await authStore.login(email.value, password.value);
         router.push("/");
     } catch (error) {
-        errorMessage.value = error.message;
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        errorMessage.value =
+            error instanceof Error ? error.message : String(error);
     } finally {
         loading.value = false;
     }

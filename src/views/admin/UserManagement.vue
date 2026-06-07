@@ -62,15 +62,24 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { supabase } from "@/supabaseClient";
+import type { ProfileStatus } from "@/types/models";
 
-const loading = ref(true);
-const error = ref(null);
-const pendingUsers = ref([]);
+type PendingUser = {
+    id: string;
+    username: string;
+    email: string;
+    created_at: string;
+    pcus_drugcupsabot: { name: string } | null;
+};
 
-async function fetchPendingUsers() {
+const loading = ref<boolean>(true);
+const error = ref<string | null>(null);
+const pendingUsers = ref<PendingUser[]>([]);
+
+async function fetchPendingUsers(): Promise<void> {
     loading.value = true;
     error.value = null;
     try {
@@ -88,7 +97,8 @@ async function fetchPendingUsers() {
             .eq("status", "pending");
 
         if (fetchError) throw fetchError;
-        pendingUsers.value = data;
+        // FIX: Supabase types FK joins as arrays even for many-to-one
+        pendingUsers.value = (data ?? []) as unknown as PendingUser[];
     } catch (err) {
         console.error("Error fetching pending users:", err);
         error.value = "ไม่สามารถโหลดข้อมูลผู้ใช้ที่รอการอนุมัติได้";
@@ -101,7 +111,10 @@ onMounted(() => {
     fetchPendingUsers();
 });
 
-async function updateUserStatus(userId, newStatus) {
+async function updateUserStatus(
+    userId: string,
+    newStatus: Exclude<ProfileStatus, "pending">,
+): Promise<void> {
     const confirmationText =
         newStatus === "approved"
             ? "คุณต้องการอนุมัติผู้ใช้งานนี้ใช่หรือไม่?"
@@ -122,11 +135,15 @@ async function updateUserStatus(userId, newStatus) {
         await fetchPendingUsers();
     } catch (err) {
         console.error("Error updating user status:", err);
-        alert("เกิดข้อผิดพลาดในการอัปเดตสถานะ: " + err.message);
+        // FIX: error is unknown in strict TS, narrow to Error before reading .message
+        alert(
+            "เกิดข้อผิดพลาดในการอัปเดตสถานะ: " +
+                (err instanceof Error ? err.message : String(err)),
+        );
     }
 }
 
-function formatDate(dateString) {
+function formatDate(dateString: string | null): string {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleString("th-TH", {
         year: "numeric",
