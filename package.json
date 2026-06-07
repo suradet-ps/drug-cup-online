@@ -8,7 +8,14 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "fmt": "biome format --write .",
+    "fmt:check": "biome format .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "ci": "biome ci ."
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.0",
@@ -19,6 +26,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.16",
     "@types/node": "^25.9.2",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.9.1",
