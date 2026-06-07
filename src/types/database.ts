@@ -216,7 +216,7 @@ export type Database = {
             approved_quantity: number;
           }>;
         };
-        Returns: void;
+        Returns: undefined;
       };
       get_accounting_summary_by_period: {
         Args: {

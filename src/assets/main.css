@@ -547,6 +547,7 @@ tfoot td {
     background-color: #fff;
   }
   .no-print {
+    /* biome-ignore lint/complexity/noImportantStyles: print utility must override screen styles */
     display: none !important;
   }
 }
