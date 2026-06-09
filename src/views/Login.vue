@@ -167,8 +167,8 @@ async function handleLogin(): Promise<void> {
     font-size: var(--text-caption);
     margin-top: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    background-color: #fff5f5;
-    border: 1px solid rgba(179, 0, 0, 0.2);
+    background-color: var(--color-pale-pink);
+    border: 1px solid rgba(194, 59, 59, 0.2);
     border-radius: var(--radius-xs);
 }
 
@@ -181,7 +181,7 @@ async function handleLogin(): Promise<void> {
 }
 
 .register-link a {
-    color: var(--color-action-blue);
+    color: #5b7ec4;
     font-weight: var(--weight-normal);
 }
 

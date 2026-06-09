@@ -1,5 +1,5 @@
 /* Design Token: Typography
-   Source of truth: DESIGN.md §Typography
+   Source of truth: DESIGN.md ยงTypography
    ------------------------------------------------------------------ */
 :root {
   /* Font Families */
@@ -9,18 +9,18 @@
   --font-mono: "CohereMono", "Courier New", "Arial", ui-sans-serif, system-ui;
 
   /* Font Sizes */
-  --text-hero: 96px;
-  --text-product-display: 72px;
-  --text-section-display: 60px;
-  --text-section-heading: 48px;
-  --text-card-heading: 32px;
-  --text-feature-heading: 24px;
-  --text-body-lg: 18px;
-  --text-body: 16px;
-  --text-button: 14px;
-  --text-caption: 14px;
-  --text-mono-label: 14px;
-  --text-micro: 12px;
+  --text-hero: 100px;
+  --text-product-display: 76px;
+  --text-section-display: 64px;
+  --text-section-heading: 50px;
+  --text-card-heading: 34px;
+  --text-feature-heading: 26px;
+  --text-body-lg: 19px;
+  --text-body: 17px;
+  --text-button: 15px;
+  --text-caption: 15px;
+  --text-mono-label: 15px;
+  --text-micro: 13px;
 
   /* Line Heights */
   --leading-tight: 1;

@@ -1,6 +1,7 @@
 /* ===================================================================
-   main.css — Global Design System
+   main.css โ€” Global Design System
    Imports all token files. DESIGN.md is the single source of truth.
+   Theme: ���้า-ชมพู Pastel
    =================================================================== */
 
 @import "./css/tokens/colors.css";
@@ -11,28 +12,29 @@
 @import "./css/tokens/motion.css";
 
 /* -------------------------------------------------------------------
-   Semantic aliases — map design tokens to component roles
+   Semantic aliases โ€” map design tokens to component roles
    ------------------------------------------------------------------- */
 :root {
-  /* Primary action color: near-black (Cohere CTA style) */
+  /* Primary action: blue-pink gradient */
   --color-primary: var(--color-near-black);
-  --color-primary-hover: #2c2c34;
+  --color-primary-hover: #2a2a3e;
 
   /* Danger */
   --color-danger: var(--color-error);
-  --color-danger-hover: #8b0000;
+  --color-danger-hover: #9e2e2e;
 
   /* Warning */
   --color-warning: var(--color-status-submitted);
-  --color-warning-hover: #92400e;
+  --color-warning-hover: #a76e2e;
 
   /* Success */
   --color-success: var(--color-status-fulfilled);
-  --color-success-hover: #14532d;
+  --color-success-hover: #3a704a;
 
-  /* Info (links/secondary actions) */
-  --color-info: var(--color-action-blue);
-  --color-info-hover: #1251b0;
+  /* Info (links/secondary actions) โ€” use blue accent */
+  --color-info: var(--color-approved);
+  --color-info-hover: var(--color-blue-hover);
+  --color-approved: #5b7ec4;
 
   /* Text roles */
   --text-color: var(--color-ink);
@@ -46,18 +48,18 @@
 
   /* Legacy aliases for scoped styles in existing views */
   --primary-color: var(--color-near-black);
-  --primary-hover: #2c2c34;
+  --primary-hover: #2a2a3e;
   --secondary-color: var(--color-muted-slate);
   --secondary-hover: var(--color-slate);
   --danger-color: var(--color-error);
-  --danger-hover: #8b0000;
+  --danger-hover: #9e2e2e;
   --warning-color: var(--color-status-submitted);
-  --warning-hover: #92400e;
+  --warning-hover: #a76e2e;
   --success-color: var(--color-status-fulfilled);
-  --success-hover: #14532d;
-  --info-color: var(--color-action-blue);
-  --info-hover: #1251b0;
-  --text-on-primary: var(--color-canvas);
+  --success-hover: #3a704a;
+  --info-color: #5b7ec4;
+  --info-hover: #8ba8e6;
+  --text-on-primary: var(--color-near-black);
   --text-on-accent: var(--color-canvas);
   --box-shadow: var(--shadow-card);
   --box-shadow-lg: var(--shadow-overlay);
@@ -107,8 +109,6 @@ main {
 /* -------------------------------------------------------------------
    Typography
    ------------------------------------------------------------------- */
-/* DESIGN.md: Section Heading / Card Heading / Feature Heading use Unica77
-   (body/UI face). Only hero/display headings use the display face.     */
 h1,
 h2,
 h3,
@@ -122,7 +122,6 @@ h6 {
   margin-bottom: var(--space-3);
 }
 
-/* Hero display — use display face for true hero moments */
 .hero-heading,
 .display-heading {
   font-family: var(--font-display);
@@ -159,14 +158,14 @@ p {
 }
 
 a {
-  color: var(--color-action-blue);
+  color: #5b7ec4;
   text-decoration: none;
   font-weight: var(--weight-normal);
   transition: color var(--duration-base) var(--easing-standard);
 }
 
 a:hover {
-  color: var(--color-info-hover);
+  color: var(--color-blue-hover);
   text-decoration: underline;
 }
 
@@ -186,7 +185,7 @@ a:focus-visible {
 }
 
 /* -------------------------------------------------------------------
-   Card — flat, thin-bordered (DESIGN.md §Elevation: Bordered)
+   Card โ€” flat, thin-bordered
    ------------------------------------------------------------------- */
 .card {
   background-color: var(--color-canvas);
@@ -211,7 +210,6 @@ a:focus-visible {
   font-weight: var(--weight-semibold);
 }
 
-/* Mono label: uppercase technical labels (DESIGN.md §Mono Label) */
 .mono-label {
   font-family: var(--font-mono);
   font-size: var(--text-mono-label);
@@ -235,14 +233,14 @@ a:focus-visible {
   padding: var(--space-4) var(--space-6);
   font-size: var(--text-body);
   color: var(--color-error);
-  background-color: #fff5f5;
-  border: 1px solid rgba(179, 0, 0, 0.25);
+  background-color: var(--color-pale-pink);
+  border: 1px solid rgba(194, 59, 59, 0.25);
   border-radius: var(--radius-sm);
   margin-bottom: var(--space-4);
 }
 
 /* -------------------------------------------------------------------
-   Form elements — contact-form-card style (DESIGN.md §contact-form-card)
+   Form elements โ€” contact-form-card style
    ------------------------------------------------------------------- */
 .form-group {
   margin-bottom: var(--space-5);
@@ -297,7 +295,7 @@ select:disabled {
 }
 
 /* -------------------------------------------------------------------
-   Buttons — pill-shaped, near-black primary (DESIGN.md §button-primary)
+   Buttons โ€” pill-shaped, gradient primary
    ------------------------------------------------------------------- */
 .btn {
   display: inline-flex;
@@ -314,7 +312,7 @@ select:disabled {
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition:
-    background-color var(--duration-base) var(--easing-standard),
+    background var(--duration-base) var(--easing-standard),
     border-color var(--duration-base) var(--easing-standard),
     color var(--duration-base) var(--easing-standard),
     box-shadow var(--duration-base) var(--easing-standard);
@@ -335,17 +333,17 @@ select:disabled {
   cursor: not-allowed;
 }
 
-/* button-primary: near-black pill */
+/* button-primary: blue-pink gradient pill with dark text */
 .btn-primary {
-  background-color: var(--color-near-black);
-  border-color: var(--color-near-black);
-  color: var(--color-canvas);
+  background: var(--gradient-primary);
+  border-color: transparent;
+  color: var(--color-near-black);
 }
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
+  background: var(--gradient-primary-hover);
+  border-color: transparent;
   text-decoration: none;
-  color: var(--color-canvas);
+  color: var(--color-near-black);
 }
 
 /* button-secondary: outline variant */
@@ -361,17 +359,16 @@ select:disabled {
   color: var(--color-ink);
 }
 
-/* button-pill-outline: research filter style (DESIGN.md §button-pill-outline) */
+/* button-pill-outline: gradient border style */
 .btn-pill-outline {
   background-color: transparent;
-  border-color: var(--color-near-black);
-  border-width: 1px;
+  border: 1px solid #b0cfff;
   border-radius: var(--radius-xl);
-  color: var(--color-near-black);
+  color: #5b7ec4;
 }
 .btn-pill-outline:hover:not(:disabled) {
-  background-color: var(--color-near-black);
-  color: var(--color-canvas);
+  background: var(--gradient-blue);
+  color: var(--color-near-black);
   text-decoration: none;
 }
 
@@ -416,15 +413,15 @@ select:disabled {
 
 /* Info */
 .btn-info {
-  background-color: var(--color-action-blue);
-  border-color: var(--color-action-blue);
-  color: var(--color-canvas);
+  background: var(--gradient-blue);
+  border-color: transparent;
+  color: var(--color-near-black);
 }
 .btn-info:hover:not(:disabled) {
-  background-color: var(--color-info-hover);
-  border-color: var(--color-info-hover);
+  background: linear-gradient(135deg, #8ba8e6, #b3d0f5);
+  border-color: transparent;
   text-decoration: none;
-  color: var(--color-canvas);
+  color: var(--color-near-black);
 }
 
 /* Small size modifier */
@@ -434,8 +431,7 @@ select:disabled {
 }
 
 /* -------------------------------------------------------------------
-   Tables — research-table style (DESIGN.md §research-table)
-   Rule-separated rows, no heavy decoration.
+   Tables โ€” research-table style
    ------------------------------------------------------------------- */
 .table-wrapper {
   overflow-x: auto;
@@ -477,7 +473,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background-color: rgba(238, 236, 231, 0.5);
+  background-color: color-mix(in srgb, var(--color-pale-blue) 50%, transparent);
 }
 
 tbody tr:last-child td {
@@ -497,7 +493,7 @@ tfoot td {
 }
 
 /* -------------------------------------------------------------------
-   Status badges — mono-label chip style
+   Status badges โ€” mono-label chip style
    ------------------------------------------------------------------- */
 .status-badge {
   display: inline-flex;
@@ -519,24 +515,24 @@ tfoot td {
   border: 1px solid var(--color-hairline);
 }
 .status-badge.submitted {
-  background-color: #fef3c7;
-  color: #92400e;
-  border: 1px solid #fcd34d;
+  background-color: var(--color-pale-pink);
+  color: #c96d6d;
+  border: 1px solid rgba(201, 109, 109, 0.3);
 }
 .status-badge.approved {
   background-color: var(--color-pale-blue);
-  color: var(--color-action-blue);
-  border: 1px solid rgba(24, 99, 220, 0.25);
+  color: #5b7ec4;
+  border: 1px solid rgba(91, 126, 196, 0.3);
 }
 .status-badge.fulfilled {
-  background-color: var(--color-pale-green);
+  background-color: #e8f5ec;
   color: var(--color-status-fulfilled);
-  border: 1px solid rgba(22, 101, 52, 0.25);
+  border: 1px solid rgba(74, 140, 92, 0.3);
 }
 .status-badge.rejected {
-  background-color: #fff5f5;
+  background-color: var(--color-pale-pink);
   color: var(--color-error);
-  border: 1px solid rgba(179, 0, 0, 0.25);
+  border: 1px solid rgba(194, 59, 59, 0.3);
 }
 
 /* -------------------------------------------------------------------
@@ -571,7 +567,7 @@ tfoot td {
 /* Large Mobile */
 @media (max-width: 768px) {
   body {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   h1 {

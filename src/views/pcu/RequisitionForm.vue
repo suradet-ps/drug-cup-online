@@ -393,11 +393,11 @@ th.text-center {
 }
 
 .locked-item {
-    background-color: #f8f9fa;
-    color: #adb5bd;
+    background-color: var(--color-soft-stone);
+    color: var(--color-muted-slate);
 }
 .locked-item .quantity-input {
-    background-color: #e9ecef;
+    background-color: var(--color-card-border);
     cursor: not-allowed;
 }
 .item-note {

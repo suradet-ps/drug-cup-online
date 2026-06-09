@@ -280,8 +280,8 @@ form .btn span {
 
 .error-message {
     color: var(--color-error);
-    background-color: #fff5f5;
-    border: 1px solid rgba(179, 0, 0, 0.2);
+    background-color: var(--color-pale-pink);
+    border: 1px solid rgba(194, 59, 59, 0.2);
     border-radius: var(--radius-xs);
     padding: var(--space-3) var(--space-4);
     margin-top: var(--space-4);
@@ -296,7 +296,7 @@ form .btn span {
 }
 
 .login-link a {
-    color: var(--color-action-blue);
+    color: #5b7ec4;
 }
 
 @media (max-width: 480px) {

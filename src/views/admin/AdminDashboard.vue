@@ -177,15 +177,15 @@ h3 {
 
 /* Status badge overrides (supplement global) */
 .status-badge.submitted {
-    background-color: #fef3c7;
-    color: #92400e;
-    border: 1px solid #fcd34d;
+    background-color: var(--color-pale-pink);
+    color: #c96d6d;
+    border: 1px solid rgba(201, 109, 109, 0.3);
 }
 
 .status-badge.approved {
     background-color: var(--color-pale-blue);
-    color: var(--color-action-blue);
-    border: 1px solid rgba(24, 99, 220, 0.2);
+    color: #5b7ec4;
+    border: 1px solid rgba(91, 126, 196, 0.3);
 }
 
 /* Action links as small pill buttons */
@@ -204,14 +204,14 @@ h3 {
 }
 
 .btn-primary {
-    background-color: var(--color-near-black);
-    color: var(--color-canvas);
+    background: var(--gradient-primary);
+    color: var(--color-near-black);
     border: none;
 }
 .btn-primary:hover {
-    background-color: var(--color-primary-hover);
+    background: var(--gradient-primary-hover);
     text-decoration: none;
-    color: var(--color-canvas);
+    color: var(--color-near-black);
 }
 
 .btn-success {

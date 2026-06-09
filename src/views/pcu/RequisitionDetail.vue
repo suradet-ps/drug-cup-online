@@ -341,7 +341,7 @@ thead {
 }
 
 .status-approved {
-    color: #2e7d32;
+    color: var(--color-status-fulfilled);
     font-weight: bold;
 }
 

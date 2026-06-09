@@ -446,7 +446,7 @@ table {
     transition: 0.4s;
 }
 input:checked + .slider {
-    background-color: var(--color-near-black);
+    background: var(--gradient-primary);
 }
 input:checked + .slider:before {
     transform: translateX(26px);

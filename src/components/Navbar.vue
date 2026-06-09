@@ -212,8 +212,8 @@ async function handleLogout(): Promise<void> {
 
 .btn-logout:hover {
     color: var(--color-error);
-    background-color: #fff5f5;
-    border-color: rgba(179, 0, 0, 0.2);
+    background-color: var(--color-pale-pink);
+    border-color: rgba(194, 59, 59, 0.2);
 }
 
 /* Hamburger */

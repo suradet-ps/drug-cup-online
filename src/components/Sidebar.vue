@@ -51,10 +51,10 @@ defineProps<{ isOpen: boolean }>();
 </script>
 
 <style scoped>
-/* Dark product panel — DESIGN.md §dark-feature-band / enterprise sidebar */
+/* Gradient sidebar — DESIGN.md ยงgradient-sidebar */
 .sidebar {
     width: 260px;
-    background-color: var(--color-near-black);
+    background: var(--gradient-sidebar);
     border-right: none;
     display: flex;
     flex-direction: column;
@@ -71,12 +71,12 @@ defineProps<{ isOpen: boolean }>();
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-6);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .sidebar-header .logo {
     font-size: 1.5rem;
-    color: var(--color-canvas);
+    color: #5b7ec4;
     opacity: 0.9;
 }
 
@@ -90,8 +90,8 @@ defineProps<{ isOpen: boolean }>();
 .header-text .title {
     font-family: var(--font-display);
     font-size: var(--text-body);
-    font-weight: var(--weight-normal);
-    color: var(--color-canvas);
+    font-weight: var(--weight-semibold);
+    color: var(--color-ink);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -100,7 +100,7 @@ defineProps<{ isOpen: boolean }>();
 .header-text .subtitle {
     font-size: var(--text-micro);
     font-weight: var(--weight-normal);
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--color-muted-slate);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -118,7 +118,7 @@ defineProps<{ isOpen: boolean }>();
     gap: var(--space-3);
     padding: var(--space-2-5) var(--space-4);
     border-radius: var(--radius-sm);
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--color-muted-slate);
     font-size: var(--text-caption);
     font-weight: var(--weight-normal);
     text-decoration: none;
@@ -136,18 +136,19 @@ defineProps<{ isOpen: boolean }>();
 }
 
 .sidebar-nav a:hover {
-    background-color: rgba(255, 255, 255, 0.07);
-    color: var(--color-canvas);
+    background-color: rgba(91, 126, 196, 0.12);
+    color: var(--color-ink);
     text-decoration: none;
 }
 
 .sidebar-nav a.router-link-exact-active {
-    background-color: rgba(255, 255, 255, 0.12);
-    color: var(--color-canvas);
+    background-color: rgba(91, 126, 196, 0.18);
+    color: #5b7ec4;
+    font-weight: var(--weight-semibold);
 }
 
 .sidebar-nav a.router-link-exact-active i {
-    color: var(--color-canvas);
+    color: #5b7ec4;
 }
 
 @media (max-width: 992px) {

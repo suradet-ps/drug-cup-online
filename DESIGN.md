@@ -1,55 +1,73 @@
 ## Overview
 
-Cohere's current web presence feels like a sober enterprise AI command center with editorial restraint. The home page opens on a huge typographic declaration over a white canvas, then uses photography, dark product mockups, trust logos, and generous empty space to make AI infrastructure feel controlled rather than speculative. Product pages invert the tone into deep green-black or dark navy bands, while blog and research pages move toward publishing-system clarity: large filters, thin rules, dense lists, and pale technical backgrounds.
+The system uses a soft, approachable pastel palette centred on blue and pink accents over a warm cream canvas. The design feels calm, modern, and healthcare-appropriate โ€” clean enough for administrative workflows but warm enough to feel human. Gradients blend blue and pink throughout primary actions, sidebars, and decorative surfaces, while the cream base keeps the interface bright and readable.
 
-What makes the system distinctive is the mix of austere black-and-white UI with bursts of tactile brand imagery. The site avoids decorative chrome in the normal interface; color arrives through photography, abstract 3D media, coral blog taxonomy chips, blue research links, and dark product environments. Cards are rounded but not cute. Type is large, tight, and almost monospaced in spirit, creating a research-lab cadence across marketing, product, and editorial surfaces.
+What makes the system distinctive is the gradient-driven UI: buttons use blue-to-pink diagonal gradients with dark text for strong contrast, the admin sidebar uses a deep navy-to-plum vertical gradient, and section surfaces alternate between pale-blue and pale-pink washes. Cards are rounded but not cute. Type is large, tight, and measured, creating a professional cadence across administrative and clinical surfaces.
 
 **Key Characteristics:**
-- Monumental display headlines with very tight line height and negative tracking.
-- White editorial canvases interrupted by deep green, dark navy, and image-led CTA bands.
+- Pastel blue-pink gradient primary actions with dark text for excellent contrast.
+- Warm cream canvas as the default surface; pale blue and pale pink washes for section variety.
 - Rounded media cards and product cards, usually 8px to 22px.
-- Pill CTAs in near-black or white, with most secondary actions rendered as underlined text links.
-- Trust-logo strips with monochrome partner marks and very wide vertical spacing.
-- Agent-console mockups using dark panels, small status chips, and product integration badges.
-- Blog and research surfaces with prominent taxonomy chips, long rule-separated lists, and search fields.
+- Pill CTAs using gradients instead of flat fills, with most secondary actions rendered as underlined text links.
+- Dark gradient sidebar for admin navigation with subtle blue and pink undertones.
+- Blue and pink status badges with soft matching backgrounds.
+- Clean rule-separated tables with pale-blue hover states.
 
 ## Colors
 
+**Theme: ฟ้า-ชมพู Pastel** — A soft, approachable pink-and-blue palette on a warm cream canvas. Gradients are used throughout the UI for primary actions, surfaces, and decorative accents. The palette emphasises blue (`#b0cfff`) and pink (`#ffb0d9`) as brand accents with a cream canvas (`#f9f8f2`).
+
 ### Brand & Accent
 
-- **Cohere Black** (`#000000`): Announcement bar, highest-contrast text, and the global brand anchor.
-- **Near-Black Primary** (`#17171c`): Primary CTA buttons, dark footer, and deep UI cards.
-- **Deep Enterprise Green** (`#003c33`): Product hero bands for North and Command-style dark sections.
-- **Dark Navy** (`#071829`): Financial-services and security-oriented solution bands.
-- **Action Blue** (`#1863dc`): Editorial links, pagination, and secondary action emphasis.
-- **Coral** (`#ff7759`): Blog category chips, taxonomy outlines, and warm product markers.
-- **Soft Coral** (`#ffad9b`): Pale chip borders and segmented article-label details.
+- **Dark Ink** (`#1a1a2e`): Highest-contrast text, dark UI panels, and the global brand anchor.
+- **Blue** (`#b0cfff`): Primary action accent, button gradient start, link hover states.
+- **Blue Hover** (`#8ba8e6`): Darker blue for hover/interaction feedback.
+- **Light Blue** (`#c9dcf9`): Soft blue surface, gradient component, pale accent backgrounds.
+- **Pink** (`#ffb0d9`): Primary warm accent, button gradient end, decorative markers.
+- **Pink Hover** (`#e695b5`): Darker pink for hover/interaction feedback.
+- **Light Pink** (`#f9c9e2`): Soft pink surface, gradient component, pale accent backgrounds.
 
 ### Surface & Background
 
-- **Canvas White** (`#ffffff`): Dominant page background and form/card surface.
-- **Soft Stone** (`#eeece7`): Product cards, testimonial placeholders, and warm neutral surface blocks.
-- **Pale Green Wash** (`#edfce9`): North page section backdrop behind stacked dark capability panels.
-- **Pale Blue Wash** (`#f1f5ff`): Blog CTA surface behind abstract 3D imagery.
-- **Card Border** (`#f2f2f2`): Softest card containment line.
+- **Canvas Cream** (`#f9f8f2`): Dominant page background and form/card surface.
+- **Soft Stone** (`#f0ede5`): Warm neutral surface blocks, disabled states.
+- **Pale Blue Wash** (`#eaf1fc`): Blue-tinted section backdrop, approved badge background.
+- **Pale Pink Wash** (`#fdeaf2`): Pink-tinted section backdrop, error badge background.
+- **Card Border** (`#e8e4db`): Softest card containment line, warm neutral edge.
 
 ### Text & Rules
 
 - **Ink** (`#212121`): Default body text and most link text on light backgrounds.
-- **Muted Slate** (`#93939f`): Footer links, dates, metadata, and de-emphasized labels.
-- **Slate** (`#75758a`): Research separators and tertiary text.
-- **Hairline** (`#d9d9dd`): Standard list rules and section dividers.
-- **Border Light** (`#e5e7eb`): Secondary divider and utility rule.
+- **Muted Slate** (`#7a7a85`): Footer links, dates, metadata, and de-emphasized labels.
+- **Slate** (`#6b6b77`): Research separators and tertiary text.
+- **Hairline** (`#d5d0c7`): Standard list rules and section dividers.
+- **Border Light** (`#e0dbd2`): Secondary divider and utility rule.
 
 ### Semantic
 
-- **Focus Blue** (`#4c6ee6`): Keyboard focus and ring color.
-- **Form Focus Violet** (`#9b60aa`): Focus border for text inputs.
-- **Error Red** (`#b30000`): Extracted ring/shadow color associated with validation-like states.
+- **Focus Blue** (`#6b8fd1`): Keyboard focus and ring color.
+- **Form Focus Pink** (`#d487aa`): Focus border for text inputs.
+- **Error Red** (`#c23b3b`): Validation error states, danger actions.
 
 ### Gradient System
 
-Cohere does not use gradients as a generic UI fill. Gradients and color fields are media-led: abstract 3D hero imagery, deep blue open-science particle fields, red-orange product video posters, and dark green-to-black product environments. Keep UI surfaces flat; reserve gradient richness for large media panels and CTA image bands.
+Gradients are a core part of the UI identity. They blend blue and pink across multiple contexts:
+
+- **Primary CTA Gradient** (`#b0cfff → #ffb0d9`): Blue-to-pink diagonal gradient for primary buttons, with dark text for strong contrast.
+- **Primary Hover Gradient** (`#8ba8e6 → #e695b5`): Darker blue-to-pink for hover states.
+- **Hero Gradient** (`#c9dcf9 → #f9c9e2 → #ffb0d9`): Three-stop gradient for hero sections and large media panels.
+- **Blue Gradient** (`#b0cfff → #c9dcf9`): Monochromatic blue gradient for info buttons and blue surfaces.
+- **Pink Gradient** (`#ffb0d9 → #f9c9e2`): Monochromatic pink gradient for warm accents.
+- **Sidebar Gradient** (`#c9dcf9 → #eaf1fc → #f9f8f2 → #fdeaf2 → #f9c9e2`): Soft pastel blue-to-pink vertical gradient for the admin sidebar, with dark text for readability.
+- **Surface Gradient** (`#f9f8f2 → #eaf1fc`): Subtle cream-to-pale-blue backdrop for elevated surfaces.
+
+### Status Colors
+
+- **Draft** (`#7a7a85`): Muted slate, neutral pending state.
+- **Submitted** (`#c9893b`): Warm amber, awaiting review.
+- **Approved** (`#5b7ec4`): Medium blue, confirmed/active state.
+- **Fulfilled** (`#4a8c5c`): Green, completed/satisfied state.
+- **Rejected** (`#c23b3b`): Error red, declined state.
 
 ## Typography
 
@@ -108,14 +126,14 @@ Cohere uses whitespace as a trust signal. Large empty intervals separate the bra
 
 ## Elevation & Depth
 
-Cohere is mostly flat. Depth comes from surface alternation, media contrast, rounded corners, and thin borders rather than drop shadows.
+The system is mostly flat. Depth comes from surface alternation, gradient contrast, rounded corners, and thin borders rather than drop shadows.
 
 | Level | Treatment | Use |
 |---|---|---|
-| Flat | No shadow, white or dark field | Hero copy, research lists, editorial surfaces |
-| Bordered | 1px `#d9d9dd`, `#e5e7eb`, or dark translucent rules | Research rows, forms, pale cards, footer inputs |
-| Media Lift | Rounded image or video over contrasting section color | Hero photo cards, product videos, CTA imagery |
-| Dark Product Field | Deep green or navy full-width band | Command, North, financial services, security sections |
+| Flat | No shadow, cream or pale-blue/pink wash field | Hero copy, research lists, editorial surfaces |
+| Bordered | 1px `#d5d0c7`, `#e0dbd2`, or dark translucent rules | Research rows, forms, pale cards, nav elements |
+| Gradient Lift | Blue-to-pink gradient over contrasting section color | Primary buttons, sidebar, hero sections |
+| Dark Gradient Field | Deep navy-to-plum full-width gradient band | Admin sidebar, dark feature sections |
 
 ## Shapes
 
@@ -139,7 +157,7 @@ Images are not decorative backdrops for text except in CTA bands. Most imagery s
 
 ### **`button-primary`**
 
-Near-black or white pill CTA, depending on surface contrast. Uses 14px-16px Unica77, 12px 24px padding, and a 32px pill radius. This is the primary action style for "Request a demo", "Submit", and hero CTAs.
+Blue-to-pink gradient pill CTA with dark text. Uses 14px-15px Unica77, 12px 24px padding, and a 32px pill radius. This is the primary action style for "Submit", "Save", and hero CTAs. The gradient provides visual energy while dark text ensures strong contrast.
 
 ### **`button-secondary`**
 
@@ -171,7 +189,7 @@ Content block with thin-line geometric illustration, 24px heading, body copy, an
 
 ### **`dark-feature-band`**
 
-Deep green or navy full-width section used for product capabilities, security claims, and feature breakdowns. Text turns white; cards use darker translucent surfaces, pale borders, and abstract line illustrations.
+Dark navy-to-plum gradient full-width section used for the admin sidebar and dark feature bands. Text turns white; nav items use translucent white overlays with blue and pink undertones.
 
 ### **`product-card`**
 
@@ -197,23 +215,22 @@ Dark footer subscription block with coral "AI moves fast" label, white headline,
 
 ### Do
 
-- Use white canvas as the default surface; introduce dark green or navy as full-width product bands.
-- Keep primary CTAs pill-shaped and near-black on light surfaces.
+- Use cream canvas as the default surface; introduce pale-blue or pale-pink washes as section backgrounds.
+- Keep primary CTAs using the blue-to-pink gradient with dark text for strong contrast.
 - Use 22px radius on major media cards and placeholders.
-- Use coral for editorial taxonomy and small warm accents, not as the main CTA system.
-- Use monochrome trust logos with wide spacing.
-- Use thin-line geometric illustrations for research and capability icons.
-- Let photography and product mockups carry color, while the UI shell stays restrained.
+- Use pink for editorial taxonomy and small warm accents.
+- Use the dark gradient sidebar for admin navigation.
+- Let gradient buttons and status badges carry color, while the UI shell stays restrained.
 
 ### Don't
 
-- Do not turn coral or blue into broad decorative surface colors.
+- Do not use the gradient on non-interactive text or body copy.
 - Do not add heavy drop shadows to cards.
-- Do not make every section card-based; Cohere often uses unframed rows, rules, and open space.
+- Do not make every section card-based; use unframed rows, rules, and open space between sections.
 - Do not use rounded cards below 8px for major media.
 - Do not replace the display/body type split with one generic sans-serif voice.
 - Do not render undocumented interaction variants in documentation or previews.
-- Do not use saturated gradients as normal UI backgrounds; keep gradients media-led.
+- Do not use saturated solid fills as normal UI backgrounds; keep gradients as the primary visual treatment.
 
 ## Responsive Behavior
 
@@ -242,10 +259,10 @@ Primary CTAs and pills meet comfortable touch sizing through 12px-24px padding a
 
 ## Iteration Guide
 
-1. Start from a white canvas or a full-width dark green/navy band; avoid mid-tone page backgrounds unless the screenshot shows a specific CTA/form section.
-2. Use `button-primary` for the single highest-priority action and `button-secondary` for the companion action.
-3. Use `hero-photo-card` or `agent-console-card` when a page needs visual energy; avoid invented dashboard data.
-4. For editorial pages, combine `blog-filter-chip`, `button-pill-outline`, and `research-table` instead of generic marketing cards.
+1. Start from a cream canvas or a pale-blue/pale-pink wash; avoid mid-tone page backgrounds unless the design calls for a specific CTA/form section.
+2. Use `button-primary` (gradient) for the single highest-priority action and `button-secondary` for the companion action.
+3. Use the dark gradient sidebar for admin navigation panels.
+4. For tabular data, use rule-separated rows with pale-blue hover states.
 5. Keep component examples structurally honest: placeholder product frames are better than invented product content.
 
 ## Known Gaps
