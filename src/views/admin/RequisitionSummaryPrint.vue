@@ -212,18 +212,20 @@ function formatDate(dateString: string | Date): string {
 </script>
 
 <style>
+@page {
+    size: A4 landscape;
+    margin: 10mm;
+}
 @media print {
-    @page landscape {
-        size: A4 landscape;
-    }
-    .landscape {
-        page: landscape;
+    body {
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 }
 </style>
 
 <style scoped>
-/* A4 page styles in landscape */
 body {
     background-color: #eee;
     margin: 0;
@@ -237,10 +239,9 @@ body {
 }
 .page {
     background: white;
-    width: 297mm;
-    min-height: 210mm;
-    padding: 15mm;
-    margin: 10mm auto;
+    width: 100%;
+    padding: 10mm;
+    margin: 0 auto;
     box-sizing: border-box;
 }
 
@@ -292,6 +293,7 @@ th.center {
     writing-mode: vertical-rl;
     text-orientation: mixed;
     white-space: nowrap;
+    min-width: 36px;
 }
 
 /* Print-specific styles */
@@ -305,7 +307,7 @@ th.center {
         font-size: 9pt;
     }
     .page {
-        padding: 10mm 15mm;
+        padding: 8mm 12mm;
     }
     thead {
         display: table-header-group;

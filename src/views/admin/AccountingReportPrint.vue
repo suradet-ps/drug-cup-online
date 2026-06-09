@@ -146,6 +146,20 @@ function formatCurrency(value: number | null): string {
 }
 </script>
 
+<style>
+@page {
+    size: A4 landscape;
+    margin: 10mm;
+}
+@media print {
+    body {
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+</style>
+
 <style scoped>
 body {
     background-color: #eee;
@@ -159,9 +173,8 @@ body {
 }
 .page {
     background: white;
-    width: 297mm;
-    min-height: 210mm;
-    padding: 15mm;
+    width: 100%;
+    padding: 12mm;
     margin: 0 auto;
     box-sizing: border-box;
     display: flex;
@@ -204,7 +217,7 @@ body {
 table {
     width: 100%;
     border-collapse: collapse;
-    border: 1px solid #000;
+    border: 2px solid #000;
 }
 th,
 td {
@@ -253,6 +266,7 @@ tfoot td {
     .page {
         margin: 0;
         box-shadow: none;
+        padding: 8mm 10mm;
     }
 }
 </style>
