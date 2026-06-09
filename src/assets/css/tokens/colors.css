@@ -38,7 +38,14 @@
   --gradient-hero: linear-gradient(135deg, #c9dcf9 0%, #f9c9e2 40%, #ffb0d9 100%);
   --gradient-blue: linear-gradient(135deg, #b0cfff, #c9dcf9);
   --gradient-pink: linear-gradient(135deg, #ffb0d9, #f9c9e2);
-  --gradient-sidebar: linear-gradient(180deg, #c9dcf9 0%, #eaf1fc 30%, #f9f8f2 50%, #fdeaf2 70%, #f9c9e2 100%);
+  --gradient-sidebar: linear-gradient(
+    180deg,
+    #c9dcf9 0%,
+    #eaf1fc 30%,
+    #f9f8f2 50%,
+    #fdeaf2 70%,
+    #f9c9e2 100%
+  );
 
   /* Status */
   --color-status-draft: var(--color-muted-slate);
