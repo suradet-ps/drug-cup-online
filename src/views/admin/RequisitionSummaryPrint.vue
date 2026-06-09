@@ -1,5 +1,5 @@
 <template>
-    <div class="print-container landscape" v-if="processedData.length > 0">
+    <div class="print-container" v-if="processedData.length > 0">
         <div class="page">
             <div class="header">
                 <h2 class="bold">ใบสรุปยอดรวมการเบิกเวชภัณฑ์</h2>
@@ -212,11 +212,11 @@ function formatDate(dateString: string | Date): string {
 </script>
 
 <style>
-@page {
-    size: A4 landscape;
-    margin: 10mm;
-}
 @media print {
+    @page {
+        size: landscape;
+        margin: 8mm;
+    }
     body {
         margin: 0;
         -webkit-print-color-adjust: exact;
@@ -227,7 +227,7 @@ function formatDate(dateString: string | Date): string {
 
 <style scoped>
 body {
-    background-color: #eee;
+    background-color: #fff;
     margin: 0;
     padding: 0;
 }
@@ -240,25 +240,25 @@ body {
 .page {
     background: white;
     width: 100%;
-    padding: 10mm;
+    padding: 8mm;
     margin: 0 auto;
     box-sizing: border-box;
 }
 
 /* Header */
 .header {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     text-align: center;
 }
 .header .bold {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
 }
 .sub-header {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
-    font-size: 16px;
+    margin-top: 8px;
+    font-size: 15px;
 }
 u {
     text-decoration: none;
@@ -266,25 +266,48 @@ u {
 }
 
 /* Table */
+.table-wrapper {
+    width: 100%;
+    overflow: visible;
+}
 table {
     width: 100%;
     border-collapse: collapse;
-    border: 2px solid #000;
+    table-layout: auto;
 }
 th,
 td {
     border: 1px solid #000;
-    padding: 6px;
+    padding: 5px 6px;
     text-align: left;
     vertical-align: top;
 }
-th {
+thead th {
     text-align: center;
     font-weight: bold;
+    border-bottom: 2px solid #000;
+}
+tbody td {
+    border: 1px solid #000;
 }
 td.center,
 th.center {
     text-align: center;
+}
+th:first-child,
+td:first-child {
+    width: 40px;
+}
+th:nth-child(2),
+td:nth-child(2) {
+    min-width: 140px;
+}
+th:nth-child(3),
+td:nth-child(3),
+th:nth-child(4),
+td:nth-child(4) {
+    width: 60px;
+    white-space: nowrap;
 }
 .total-col {
     background-color: #f2f2f2;
@@ -293,7 +316,9 @@ th.center {
     writing-mode: vertical-rl;
     text-orientation: mixed;
     white-space: nowrap;
-    min-width: 36px;
+    min-width: 34px;
+    width: 34px;
+    padding: 8px 4px;
 }
 
 /* Print-specific styles */
@@ -307,7 +332,7 @@ th.center {
         font-size: 9pt;
     }
     .page {
-        padding: 8mm 12mm;
+        padding: 6mm 10mm;
     }
     thead {
         display: table-header-group;

@@ -147,11 +147,11 @@ function formatCurrency(value: number | null): string {
 </script>
 
 <style>
-@page {
-    size: A4 landscape;
-    margin: 10mm;
-}
 @media print {
+    @page {
+        size: landscape;
+        margin: 8mm;
+    }
     body {
         margin: 0;
         -webkit-print-color-adjust: exact;

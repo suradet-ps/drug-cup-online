@@ -1,5 +1,5 @@
 <template>
-    <div class="print-container portrait" v-if="requisition">
+    <div class="print-container" v-if="requisition">
         <div class="page">
             <div class="header">
                 <div class="top-header">
@@ -257,11 +257,14 @@ function formatCurrency(value: number | null | undefined): string {
 
 <style>
 @media print {
-    @page portrait {
-        size: A4 portrait;
+    @page {
+        size: A4;
+        margin: 8mm;
     }
-    .portrait {
-        page: portrait;
+    body {
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 }
 </style>
