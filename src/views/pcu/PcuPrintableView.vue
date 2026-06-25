@@ -154,6 +154,7 @@ type PrintItem = {
   id: number;
   quantity: number;
   approved_quantity: number | null;
+  price_at_request: number;
   items_drugcupsabot: { name: string; unit_pack: string };
 };
 
@@ -181,7 +182,7 @@ const grandTotal = computed<number>(() => {
   if (!requisition.value) return 0;
   return requisition.value.requisition_items_drugcupsabot.reduce((sum, item) => {
     const quantityToUse = item.approved_quantity ?? item.quantity;
-    return sum + Number(quantityToUse) * Number(item.price_at_request ?? 0);
+    return sum + Number(quantityToUse) * Number(item.price_at_request);
   }, 0);
 });
 

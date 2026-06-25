@@ -139,6 +139,28 @@ onMounted(async () => {
   }
 });
 
+type RequisitionWithItems = {
+  id: number;
+  pcu_id: number;
+  requisition_items_drugcupsabot: Array<{
+    id: number;
+    approved_quantity: number | null;
+    items_drugcupsabot:
+      | {
+          id: number;
+          name: string;
+          category_order: number | null;
+          item_order: number | null;
+        }
+      | Array<{
+          id: number;
+          name: string;
+          category_order: number | null;
+          item_order: number | null;
+        }>;
+  }>;
+};
+
 async function processRequisitions(): Promise<void> {
   if (!selectedPeriod.value) return;
   loading.value = true;
@@ -146,63 +168,48 @@ async function processRequisitions(): Promise<void> {
   processedData.value = [];
 
   try {
+    // FIX: query จาก parent table (requisitions_drugcupsabot) แทน child table
+    // เพื่อหลีกเลี่ยง PostgREST foreign-table filter ที่อาจทำงานไม่สมบูรณ์
+    // ทำให้บาง PCU ถูก filter ออกจากผลลัพธ์ (เคยเกิดใน production)
     const { data, error: fetchError } = await supabase
-      .from('requisition_items_drugcupsabot')
+      .from('requisitions_drugcupsabot')
       .select(
         `
-        approved_quantity,
-        items_drugcupsabot (id, name, category_order, item_order),
-        requisitions_drugcupsabot (pcu_id, status, period_id)
+        id, pcu_id,
+        requisition_items_drugcupsabot (
+          id, approved_quantity,
+          items_drugcupsabot (id, name, category_order, item_order)
+        )
       `,
       )
-      .in('requisitions_drugcupsabot.status', ['approved', 'fulfilled'])
-      .eq('requisitions_drugcupsabot.period_id', selectedPeriod.value);
+      .in('status', ['approved', 'fulfilled'])
+      .eq('period_id', selectedPeriod.value);
 
     if (fetchError) throw fetchError;
 
-    const summary: Record<number, ProcessedItem> = data.reduce(
-      (acc, current) => {
-        // FIX: Supabase types FK joins as arrays even for many-to-one
-        const req = current as unknown as {
-          requisitions_drugcupsabot:
-            | { pcu_id: number; status: string; period_id: number }
-            | Array<{ pcu_id: number; status: string; period_id: number }>;
-          items_drugcupsabot:
-            | {
-                id: number;
-                name: string;
-                category_order: number | null;
-                item_order: number | null;
-              }
-            | Array<{
-                id: number;
-                name: string;
-                category_order: number | null;
-                item_order: number | null;
-              }>;
-          approved_quantity: number | null;
-        };
-        const reqJoin = Array.isArray(req.requisitions_drugcupsabot)
-          ? req.requisitions_drugcupsabot[0]
-          : req.requisitions_drugcupsabot;
-        const itemJoin = Array.isArray(req.items_drugcupsabot)
-          ? req.items_drugcupsabot[0]
-          : req.items_drugcupsabot;
+    const summary: Record<number, ProcessedItem> = {};
 
-        if (!reqJoin || !itemJoin) {
-          console.warn('Skipping orphaned requisition item:', current);
-          return acc;
+    for (const req of (data ?? []) as unknown as RequisitionWithItems[]) {
+      const pcuId = req.pcu_id;
+
+      for (const reqItem of req.requisition_items_drugcupsabot ?? []) {
+        // FIX: Supabase types FK joins as arrays even for many-to-one
+        const itemJoin = Array.isArray(reqItem.items_drugcupsabot)
+          ? reqItem.items_drugcupsabot[0]
+          : reqItem.items_drugcupsabot;
+        if (!itemJoin) {
+          console.warn('Skipping orphaned requisition item:', reqItem);
+          continue;
         }
 
         const itemId = itemJoin.id;
         const itemName = itemJoin.name;
         const categoryOrder = itemJoin.category_order;
         const itemOrder = itemJoin.item_order;
-        const pcuId = reqJoin.pcu_id;
-        const qty = req.approved_quantity || 0;
+        const qty = reqItem.approved_quantity || 0;
 
-        if (!acc[itemId]) {
-          acc[itemId] = {
+        if (!summary[itemId]) {
+          summary[itemId] = {
             item_id: itemId,
             item_name: itemName,
             total_quantity: 0,
@@ -212,13 +219,10 @@ async function processRequisitions(): Promise<void> {
           };
         }
 
-        acc[itemId].total_quantity += qty;
-        acc[itemId].pcu_breakdown[pcuId] = (acc[itemId].pcu_breakdown[pcuId] || 0) + qty;
-
-        return acc;
-      },
-      {} as Record<number, ProcessedItem>,
-    );
+        summary[itemId].total_quantity += qty;
+        summary[itemId].pcu_breakdown[pcuId] = (summary[itemId].pcu_breakdown[pcuId] || 0) + qty;
+      }
+    }
 
     processedData.value = Object.values(summary).sort((a, b) => {
       const categoryDiff = (a.category_order || 9999) - (b.category_order || 9999);
