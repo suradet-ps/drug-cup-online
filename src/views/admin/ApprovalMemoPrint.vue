@@ -89,15 +89,20 @@ const route = useRoute();
 const loading = ref<boolean>(true);
 const periodInfo = ref<Pick<RequisitionPeriod, 'name'> | null>(null);
 const reportData = ref<AccountingSummaryRow[]>([]);
-const periodId = route.query.periodId as string | undefined;
+
+const rawPeriodId = route.query.periodId;
+const periodId =
+  typeof rawPeriodId === 'string' && /^\d+$/.test(rawPeriodId)
+    ? Number.parseInt(rawPeriodId, 10)
+    : null;
 
 const grandTotal = computed<number>(() =>
   reportData.value.reduce((sum, pcu) => sum + pcu.total_value, 0),
 );
 
 onMounted(async () => {
-  if (!periodId) {
-    document.body.innerHTML = 'ไม่พบ ID ของรอบเบิก';
+  if (periodId === null) {
+    document.body.innerHTML = `ไม่พบ ID ของรอบเบิกที่ถูกต้อง (ได้รับ: ${String(rawPeriodId) || 'ว่าง'})`;
     return;
   }
   try {

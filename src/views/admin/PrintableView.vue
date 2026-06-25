@@ -171,7 +171,12 @@ const route = useRoute();
 const requisition = ref<PrintRequisition | null>(null);
 const personnel = ref<PcuPersonnel | null>(null);
 const loading = ref<boolean>(true);
-const requisitionId = route.query.id as string | undefined;
+
+const rawRequisitionId = route.query.id;
+const requisitionId =
+  typeof rawRequisitionId === 'string' && /^\d+$/.test(rawRequisitionId)
+    ? Number.parseInt(rawRequisitionId, 10)
+    : null;
 
 const emptyRows = computed<number>(() => {
   if (!requisition.value) return 0;
@@ -180,8 +185,8 @@ const emptyRows = computed<number>(() => {
 });
 
 onMounted(async () => {
-  if (!requisitionId) {
-    document.body.innerHTML = 'ไม่พบ ID ของใบเบิก';
+  if (requisitionId === null) {
+    document.body.innerHTML = `ไม่พบ ID ของใบเบิกที่ถูกต้อง (ได้รับ: ${String(rawRequisitionId) || 'ว่าง'})`;
     return;
   }
 

@@ -79,11 +79,15 @@ const periodInfo = ref<Pick<RequisitionPeriod, 'name'> | null>(null);
 const pcuList = ref<Pcu[]>([]);
 const loading = ref<boolean>(true);
 
-const periodId = route.query.periodId as string | undefined;
+const rawPeriodId = route.query.periodId;
+const periodId =
+  typeof rawPeriodId === 'string' && /^\d+$/.test(rawPeriodId)
+    ? Number.parseInt(rawPeriodId, 10)
+    : null;
 
 onMounted(async () => {
-  if (!periodId) {
-    document.body.innerHTML = 'ไม่พบ ID ของรอบเบิก';
+  if (periodId === null) {
+    document.body.innerHTML = `ไม่พบ ID ของรอบเบิกที่ถูกต้อง (ได้รับ: ${String(rawPeriodId) || 'ว่าง'})`;
     return;
   }
 
@@ -116,7 +120,7 @@ onMounted(async () => {
       `,
       )
       .in('status', ['approved', 'fulfilled'])
-      .eq('period_id', Number(periodId));
+      .eq('period_id', periodId);
 
     if (error) throw error;
 
