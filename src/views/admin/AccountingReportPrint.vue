@@ -96,11 +96,19 @@ const loading = ref<boolean>(true);
 const reportData = ref<AccountingSummaryRow[]>([]);
 const periodInfo = ref<Pick<RequisitionPeriod, 'name'> | null>(null);
 
+// FIX: accept both integer and uuid-shaped ids — see RequisitionSummaryPrint.
+const ID_INTEGER_RE = /^\d+$/;
+const ID_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function parseId(raw: unknown): number | string | null {
+  if (typeof raw !== 'string' || raw.length === 0) return null;
+  if (ID_INTEGER_RE.test(raw)) return Number.parseInt(raw, 10);
+  if (ID_UUID_RE.test(raw)) return raw;
+  return null;
+}
+
 const rawPeriodId = route.query.periodId;
-const periodId =
-  typeof rawPeriodId === 'string' && /^\d+$/.test(rawPeriodId)
-    ? Number.parseInt(rawPeriodId, 10)
-    : null;
+const periodId = parseId(rawPeriodId);
 
 const grandTotal = computed<number>(() => {
   return reportData.value.reduce((sum, pcu) => sum + pcu.total_value, 0);

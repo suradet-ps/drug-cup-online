@@ -171,11 +171,19 @@ const route = useRoute();
 const requisition = ref<PrintRequisition | null>(null);
 const personnel = ref<PcuPersonnel | null>(null);
 
+// FIX: accept both integer and uuid-shaped ids — see RequisitionSummaryPrint.
+const ID_INTEGER_RE = /^\d+$/;
+const ID_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function parseId(raw: unknown): number | string | null {
+  if (typeof raw !== 'string' || raw.length === 0) return null;
+  if (ID_INTEGER_RE.test(raw)) return Number.parseInt(raw, 10);
+  if (ID_UUID_RE.test(raw)) return raw;
+  return null;
+}
+
 const rawRequisitionId = route.query.id;
-const requisitionId =
-  typeof rawRequisitionId === 'string' && /^\d+$/.test(rawRequisitionId)
-    ? Number.parseInt(rawRequisitionId, 10)
-    : null;
+const requisitionId = parseId(rawRequisitionId);
 
 const emptyRows = computed<number>(() => {
   if (!requisition.value) return 0;
