@@ -14,15 +14,15 @@ import RequisitionSummary from '@/views/admin/RequisitionSummary.vue';
 import RequisitionSummaryPrint from '@/views/admin/RequisitionSummaryPrint.vue';
 import SystemSettings from '@/views/admin/SystemSettings.vue';
 import UserManagement from '@/views/admin/UserManagement.vue';
-import Home from '@/views/Home.vue';
+import Home from '@/views/HomeView.vue';
 // Import Components
-import Login from '@/views/Login.vue';
+import Login from '@/views/LoginView.vue';
 // PCU Views
 import PcuDashboard from '@/views/pcu/PcuDashboard.vue';
 import PcuPrintableView from '@/views/pcu/PcuPrintableView.vue';
 import RequisitionDetail from '@/views/pcu/RequisitionDetail.vue';
 import RequisitionForm from '@/views/pcu/RequisitionForm.vue';
-import Register from '@/views/Register.vue';
+import Register from '@/views/RegisterView.vue';
 import WaitingForApproval from '@/views/WaitingForApproval.vue';
 
 // Define Routes

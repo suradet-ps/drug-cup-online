@@ -1,7 +1,7 @@
 <!-- src/layouts/AdminLayout.vue -->
 <template>
     <div class="admin-layout">
-        <Sidebar :isOpen="isSidebarOpen" />
+        <AppSidebar :isOpen="isSidebarOpen" />
 
         <div
             v-if="isSidebarOpen"
@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import Sidebar from '@/components/Sidebar.vue';
+import AppSidebar from '@/components/AppSidebar.vue';
 import { useAuthStore } from '@/store/auth';
 
 const auth = useAuthStore();
