@@ -62,6 +62,7 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { supabase } from '@/supabaseClient';
 import type { Pcu, RequisitionPeriod } from '@/types/models';
+import { formatUnknownError, parseId } from '@/utils/print-helpers';
 
 type ProcessedItem = {
   item_id: number;
@@ -72,26 +73,11 @@ type ProcessedItem = {
   category_order: number | null;
   item_order: number | null;
 };
-
 const route = useRoute();
 const processedData = ref<ProcessedItem[]>([]);
 const periodInfo = ref<Pick<RequisitionPeriod, 'name'> | null>(null);
 const pcuList = ref<Pcu[]>([]);
 const loading = ref<boolean>(true);
-
-// FIX: the column may be `integer` or `uuid` depending on the production
-// schema. Accept both shapes so the print page works whichever the project
-// happens to be running against, and reject anything else up-front so a
-// malformed value never reaches PostgREST as a literal "NaN" or empty string.
-const ID_INTEGER_RE = /^\d+$/;
-const ID_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function parseId(raw: unknown): number | string | null {
-  if (typeof raw !== 'string' || raw.length === 0) return null;
-  if (ID_INTEGER_RE.test(raw)) return Number.parseInt(raw, 10);
-  if (ID_UUID_RE.test(raw)) return raw;
-  return null;
-}
 
 const rawPeriodId = route.query.periodId;
 const periodId = parseId(rawPeriodId);
@@ -230,25 +216,6 @@ function formatDate(dateString: string | Date): string {
     month: 'long',
     year: 'numeric',
   });
-}
-
-function formatUnknownError(err: unknown): string {
-  if (err === null) return 'null';
-  if (err === undefined) return 'undefined';
-  if (typeof err === 'string') return err;
-  if (err instanceof Error) return err.message;
-  if (typeof err === 'object') {
-    const obj = err as { message?: unknown; code?: unknown; details?: unknown };
-    if (typeof obj.message === 'string' && obj.message.length > 0) {
-      return obj.message;
-    }
-    try {
-      return JSON.stringify(err);
-    } catch {
-      return '[unserializable error]';
-    }
-  }
-  return String(err);
 }
 </script>
 

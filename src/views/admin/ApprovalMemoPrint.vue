@@ -84,22 +84,12 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { supabase } from '@/supabaseClient';
 import type { AccountingSummaryRow, RequisitionPeriod } from '@/types/models';
+import { formatUnknownError, parseId } from '@/utils/print-helpers';
 
 const route = useRoute();
 const loading = ref<boolean>(true);
 const periodInfo = ref<Pick<RequisitionPeriod, 'name'> | null>(null);
 const reportData = ref<AccountingSummaryRow[]>([]);
-
-// FIX: accept both integer and uuid-shaped ids — see RequisitionSummaryPrint.
-const ID_INTEGER_RE = /^\d+$/;
-const ID_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function parseId(raw: unknown): number | string | null {
-  if (typeof raw !== 'string' || raw.length === 0) return null;
-  if (ID_INTEGER_RE.test(raw)) return Number.parseInt(raw, 10);
-  if (ID_UUID_RE.test(raw)) return raw;
-  return null;
-}
 
 const rawPeriodId = route.query.periodId;
 const periodId = parseId(rawPeriodId);
@@ -152,24 +142,6 @@ function formatDate(date: Date): string {
   });
 }
 
-function formatUnknownError(err: unknown): string {
-  if (err === null) return 'null';
-  if (err === undefined) return 'undefined';
-  if (typeof err === 'string') return err;
-  if (err instanceof Error) return err.message;
-  if (typeof err === 'object') {
-    const obj = err as { message?: unknown; code?: unknown; details?: unknown };
-    if (typeof obj.message === 'string' && obj.message.length > 0) {
-      return obj.message;
-    }
-    try {
-      return JSON.stringify(err);
-    } catch {
-      return '[unserializable error]';
-    }
-  }
-  return String(err);
-}
 function formatCurrency(value: number): string {
   return Number(value).toLocaleString('th-TH', {
     minimumFractionDigits: 2,
