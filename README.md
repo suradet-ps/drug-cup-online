@@ -1,116 +1,144 @@
 # Drug Requisition System
 
-[![CI](https://github.com/suradet-ps/drug-cup-online/actions/workflows/ci.yml/badge.svg)](https://github.com/suradet-ps/drug-cup-online/actions/workflows/ci.yml)
-[![bun](https://img.shields.io/badge/bun-1.3.1-black?logo=bun&logoColor=white)](https://bun.sh)
-[![Vue 3](https://img.shields.io/badge/Vue-3.5-4FC08D?logo=vue.js&logoColor=white)](https://vuejs.org)
-[![Vite](https://img.shields.io/badge/Vite-8.0-646CFF?logo=vite&logoColor=white)](https://vitejs.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Biome](https://img.shields.io/badge/Biome-2.4-60A5FA?logo=biome&logoColor=white)](https://biomejs.dev)
-[![Supabase](https://img.shields.io/badge/Supabase-2.57-3FCF8E?logo=supabase&logoColor=white)](https://supabase.io)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+```
+██████╗ ██████╗ ██╗   ██╗ ██████╗ ██████╗██╗   ██╗██████╗
+██╔══██╗██╔══██╗██║   ██║██╔════╝██╔════╝██║   ██║██╔══██╗
+██║  ██║██████╔╝██║   ██║██║  ███╗██║     ██║   ██║██████╔╝
+██║  ██║██╔══██╗██║   ██║██║   ██║██║     ██║   ██║██╔═══╝
+██████╔╝██║  ██║╚██████╔╝╚██████╔╝╚██████╗╚██████╔╝██║
+╚═════╝ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝ ╚═╝
+```
 
-A modern, web-based drug and medical supply requisition system designed for hospitals and their affiliated primary care units (PCUs). This application streamlines the ordering process, provides robust administrative oversight, and automates report generation.
+---
 
-Built with **Vue 3 (Composition API)**, **Pinia**, **Vite**, and **Supabase** for a fast, scalable, and real-time backend experience.
+## ◆ PULSE
 
- <!-- To-do: Replace with your actual screenshot URL -->
- <!-- To-do: Replace with your actual screenshot URL -->
+A hospital does not run on goodwill; it runs on supplies that arrive.
+This system carries a requisition from the primary care unit that needs
+the drug to the hospital that holds it - draft, submit, approve, fulfill -
+with every step visible to both sides. PCU staff order from a categorized
+catalog, administrators edit quantities and generate the official
+documents, and the warehouse picks against a master summary. The paper
+work follows the work, not the other way around.
 
-## ✨ Features
+| Draft ▣ | Submitted ▣ | Approved ▣ | Fulfilled ▣ |
+|---|---|---|---|
 
-### For Primary Care Units (PCU Users)
-- **Secure Authentication:** Role-based login for PCU staff.
-- **Intuitive Dashboard:** View current requisition periods and historical submissions at a glance.
-- **Streamlined Ordering Form:** A searchable and categorized list of all available medical supplies.
-- **Draft & Submit Workflow:** Save requisition drafts and submit them for approval when ready.
-- **Real-time Status Tracking:** View the status of submissions (Draft, Submitted, Approved, Fulfilled).
-- **Locked Item Visibility:** Clearly see which items are unavailable (e.g., out of stock) with admin notes, and prevent ordering them.
-- **Requisition History:** Access and review details of all past requisitions.
+*The full lifecycle - ordering, approval, item control, reporting - is
+sealed and serving.*
 
-### For Administrators (Hospital Staff)
-- **Centralized Dashboard:** Manage all incoming requisitions from multiple PCUs.
-- **Approval Workflow:** Review, edit approved quantities, and approve or fulfill requisitions.
-- **Comprehensive Item Management:**
-    - Add, edit, or update details for all drugs and supplies (name, price, unit).
-    - Toggle item availability to prevent ordering (e.g., for out-of-stock items).
-    - Add notes to items that will be visible to PCU users.
-- **Automated Report Generation:**
-    - **Per-PCU Requisition Form:** Generate and print official, formatted requisition documents for each PCU, automatically populated with personnel details.
-    - **Summary Report:** Generate and print a master summary report (landscape view) that aggregates all approved items from all PCUs for a specific period—ideal for warehouse picking.
-    - **Excel Export:** Export report data to `.xlsx` files.
-- **System Settings:** Configure key personnel (e.g., requester, receiver) for each PCU, which are then used to auto-populate official documents.
+> Built with Vue 3 + Pinia + Vite, typed by TypeScript, guarded by Biome,
+> backed by Supabase with Row-Level Security on every table.
+>
+> **suradet-ps**, artifact keeper
 
-## 🛠️ Tech Stack
+---
 
-- **Frontend:**
-    - [Vue 3](https://vuejs.org/) (Composition API with `<script setup>`)
-    - [Vite](https://vitejs.dev/) as the build tool
-    - [Vue Router](https://router.vuejs.org/) for client-side routing
-    - [Pinia](https://pinia.vuejs.org/) for state management
-- **Backend & Database:**
-    - [Supabase](https://supabase.io/) - The open-source Firebase alternative.
-        - **PostgreSQL Database:** For storing all application data.
-        - **Authentication:** Manages user login and sessions.
-        - **Realtime APIs:** For potential future real-time updates.
-        - **Row Level Security (RLS):** To ensure users can only access their own data.
-        - **Database Functions (RPC):** For complex server-side logic.
-- **Styling:**
-    - Modern CSS with variables for a consistent design system.
-    - [Font Awesome](https://fontawesome.com/) for iconography.
+## ◆ IGNITION
 
-## 🚀 Getting Started
+One runtime, four commands.
 
-### Prerequisites
-- [Bun](https://bun.sh) v1.3+ (matches `packageManager` in `package.json`)
-- A code editor like [VS Code](https://code.visualstudio.com/)
+```
+⟫ bun install
+⟫ bun run dev
+```
 
-### Supabase Setup
-1.  Create a new project on [Supabase](https://supabase.io/).
-2.  In the SQL Editor, run the SQL scripts for creating tables (`items_drugcupsabot`, `requisitions_drugcupsabot`, etc.) and setting up RLS policies.
-3.  Navigate to **Project Settings > API**.
-4.  Find your **Project URL** and **`anon` public key**.
+Open [http://localhost:5173](http://localhost:5173).
 
-### Local Installation
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/suradet-ps/drug-cup-online.git
-    cd drug-cup-online
-    ```
+```
+⟫ bun run check       # formatter + linter + assist
+⟫ bun run typecheck   # vue-tsc, strict types
+⟫ bun run build       # type-check, then production build
+```
 
-2.  Install the dependencies:
-    ```bash
-    bun install
-    ```
+<details>
+<summary>Supabase setup</summary>
 
-3.  Create a `.env` file in the root of the project and add your Supabase credentials:
-    ```
-    VITE_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
-    VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
-    ```
+1. Create a project on [Supabase](https://supabase.io/).
+2. Run the SQL scripts in the SQL Editor: tables (`items_drugcupsabot`,
+   `requisitions_drugcupsabot`, and friends) plus their RLS policies.
+3. Copy the Project URL and `anon` key into `.env`:
 
-4.  Run the development server:
-    ```bash
-    bun run dev
-    ```
-    The application should now be running on `http://localhost:5173` (or another port if 5173 is busy).
+```
+VITE_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
+VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
 
-## 🧹 Code Quality
+</details>
 
-This project uses [Biome](https://biomejs.dev) for linting and formatting. Available scripts:
+---
 
-| Script | Description |
-| --- | --- |
-| `bun run fmt` | Format all files in place |
-| `bun run fmt:check` | Check formatting without writing |
-| `bun run lint` | Run linter |
-| `bun run lint:fix` | Run linter with auto-fix |
-| `bun run check` | Run formatter + linter + assist checks |
-| `bun run check:fix` | Run `check` with auto-fix |
-| `bun run ci` | CI-friendly check (fails on any issue) |
-| `bun run typecheck` | Run `vue-tsc` type checking |
-| `bun run build` | Type-check and build for production |
+## ◆ ANATOMY
 
+Two roles, one lifecycle, a handful of honest states.
 
-## 📄 License
+- **Orders** - PCU staff search a categorized catalog, save drafts, and
+  submit requisitions that carry their status openly: Draft, Submitted,
+  Approved, Fulfilled. Locked items are marked with the administrator's
+  note and cannot be ordered - no dead-end rows in the cart.
+- **Approves** - administrators review every requisition, adjust approved
+  quantities, and move the work forward. The dashboard aggregates all
+  incoming requests from every PCU at once.
+- **Controls** - items are managed centrally: name, price, unit,
+  availability toggle, and notes that travel to the PCU screens. Out of
+  stock is a state, not a surprise.
+- **Reports** - official per-PCU requisition forms auto-populated with
+  personnel details, a landscape master summary for warehouse picking,
+  and `.xlsx` export - the documents the pharmacy signs are generated,
+  not assembled by hand.
+- **Guards** - authentication is role-based, Row-Level Security keeps each
+  PCU's data in its own drawer, and the complex server-side logic lives
+  in Supabase RPC functions instead of client code.
 
-This project is open-source and available under the [MIT License](LICENSE).
+---
+
+## ◆ RITUALS
+
+**The core ceremony** - a requisition's journey:
+
+1. The PCU user searches the catalog, drafts the list, and submits.
+2. The status flips to Submitted; the dashboard shows it to the hospital.
+3. The administrator reviews, edits approved quantities, and approves -
+   or returns it with the reason attached.
+4. The warehouse prints the landscape summary, picks against it, and the
+   status lands on Fulfilled.
+
+**The ceremony of the locked item** - a drug that is out of stock is
+visible, annotated, and unorderable. The PCU learns why, in the
+administrator's own words, before the cart is built.
+
+**The ceremony of the document** - the requisition form carries the
+configured requester and receiver for each PCU, auto-filled, printable,
+and exportable to Excel. The report is the record; the record is the
+report.
+
+---
+
+## ◆ ECHOES
+
+**Where this artifact is heading**
+
+```
+ordering   ▸ catalog, draft, submit, status tracking ────────────── ▸ sealed
+oversight  ▸ approval workflow, item control, notes ──────────────── ▸ sealed
+reporting  ▸ per-PCU forms, landscape summary, xlsx export ───────── ▸ sealed
+```
+
+**Raising the artifact** - the design language lives in `DESIGN.md`; the
+quality bar is Biome (`bun run ci` fails on any issue) plus `vue-tsc`
+type-checking. Contributions are welcomed through the usual fork, branch,
+and pull request path.
+
+**Status** - every push is gated by the [CI workflow](.github/workflows)
+on the way to Vercel.
+
+---
+
+```
+  ─────────────────────────────────────────
+   Every requisition is a promise
+   between a clinic and a shelf.
+  ─────────────────────────────────────────
+```
+
+Open source under the [MIT License](LICENSE).
